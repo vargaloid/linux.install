@@ -5,6 +5,12 @@ I try to learn something new and develop my skills.
 
 Works only on Debian 8, 9 and CentOS 7
 
+Version 0.04
+- added utils installation
+
+Version 0.03
+- added Main Menu
+
 Version 0.02
 - added OS check
 
