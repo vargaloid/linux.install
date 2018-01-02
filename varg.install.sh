@@ -1,23 +1,43 @@
 #!/usr/bin/env bash
 
 ###############################
-# Installer by Varg. ver 0.01 #
+# Installer by Varg. ver 0.02 #
 ###############################
 
-#Prisvaivaem peremennyuy usery ot kotorogo zapushen script
-user=$(whoami)
-
-#Proveryaem ot kogo zapushen script
-if [[ $user == root ]]
- then
-  echo "Hello! What do you want to install?";
+#check root
+USER=$(whoami)
+if [ $USER == root ];  then
+  echo "Hello! $USER";
  else
-  echo "Hello $user, you have to be root to use this script";
-  exit 0
+  echo "Hello $USER, you have to be root to use this script";
+  exit 1
 fi
 
-#Proveryaem OS
-#OS=$(cat /etc/os-release | grep )
+#check OS TYPE & VERSION
+if [ -f /etc/redhat-release ]; then
+	OS_RELEASE=$(cat /etc/redhat-release | awk '{print $1}')
+	OS_VERSION=$(cat /etc/os-release | grep VERSION_ID | awk -F '\"' '{print $2}')
+	if [ $OS_RELEASE == CentOS ] && [ $OS_VERSION == 7 ]; then
+		OS="CentOS7"; echo $OS
+	else
+		echo "OS not supported!"
+		exit 1
+	fi
+elif [ -f /etc/debian_version ]; then
+	OS_RELEASE=$(lsb_release -c | awk '{print $2}')
+	if [ $OS_RELEASE == jessie ]; then
+		OS="Debian8"; echo "$OS $OS_RELEASE"
+	elif [ $OS_RELEASE == stretch ]; then
+                OS="Debian9"; echo "$OS $OS_RELEASE"
+	else
+		echo "OS not supported!"
+                exit 1
+	fi
+else
+	echo "OS Unknown"
+	exit 1
+fi
 
 #Menu
+echo "What do you want to install?"
 exit 0
