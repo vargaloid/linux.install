@@ -5,12 +5,15 @@
 ###############################
 
 #check root
-USER=$(whoami)
-if [ $USER == root ];  then
-  echo "Hello! $USER";
- else
-  echo "Hello $USER, you have to be root to use this script";
+if [ "$(id -u)" != "0" ];  then
+  echo ""
+  echo " ===== Hello $(whoami)! You need to be root to run this script! ===== "
+  echo ""
   exit 1
+else
+  echo " ==================== Hello $(whoami)! ===================="
+  echo " *** This script works only on CentOS 7; Debian 8, Debian 9 ***"
+  echo ""
 fi
 
 #check OS TYPE & VERSION
