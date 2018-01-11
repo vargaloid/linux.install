@@ -51,6 +51,7 @@ echo "|2. mc,vim,sudo,wget,net-tools,git     |"
 echo "|3. vsftpd                             |"
 echo "|4. zabbix-server                      |"
 echo "|5. OpenVPN                            |"
+echo "|6. Proxmox (Only for Debian!)         |"
 echo "----------------------------------------"
 
 read MENU
@@ -72,9 +73,17 @@ case $MENU in
 	;;
 	3)
 
+DEBVSFTPD=/etc
+CENTOSVSFTPD=/etc/vsftpd
+
 config_vsftpd() {
-cp /etc/vsftpd/vsftpd.conf /etc/vsftpd/vsftpd.conf.orig
-cat > /etc/vsftpd/vsftpd.conf <<EOF
+if [ "$OS" = "CentOS7" ]; then
+OSVSFTPD=$CENTOSVSFTPD
+else
+OSVSFTPD=$DEBVSFTPD
+fi
+cp $OSVSFTPD/vsftpd.conf $OSVSFTPD/vsftpd.conf.orig
+cat > $OSVSFTPD/vsftpd.conf <<EOF
 anonymous_enable=NO
 local_enable=YES
 write_enable=YES
@@ -93,7 +102,7 @@ allow_writeable_chroot=YES
 tcp_wrappers=YES
 EOF
 
-touch /etc/vsftpd/vsftpd.userlist
+touch $OSVSFTPD/vsftpd.userlist
 
 echo ""
 echo "Do you want to add new ftp user? (yes or no)"
@@ -112,12 +121,12 @@ yes | y)
         echo ""
         read FTPPASS
 	echo ""
-        echo "Please enter home directory for user $FTPUSER" 
+        echo "Please enter home directory for user $FTPUSER (example:/home/$FTPUSER)" 
         echo ""
         read FTPHOME
 	
 	useradd -s /bin/bash -p $FTPPASS -d $FTPHOME -m $FTPUSER
-	echo "$FTPUSER" | tee -a /etc/vsftpd/vsftpd.userlist
+	echo "$FTPUSER" | tee -a $OSVSFTPD/vsftpd.userlist
 ;;
 *)
 esac
