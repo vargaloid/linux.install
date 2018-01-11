@@ -75,26 +75,22 @@ case $MENU in
 config_vsftpd() {
 cp /etc/vsftpd/vsftpd.conf /etc/vsftpd/vsftpd.conf.orig
 cat > /etc/vsftpd/vsftpd.conf <<EOF
-anonymous_enable = NO
-local_enable = YES
-write_enable = YES
-local_umask = 022
-dirmessage_enable = YES
-xferlog_enable = YES
-xferlog_std_format = YES
-connect_from_port = YES
-listen = YES
-listen_ipv6 = NO
-pam_service_name = vsftpd
-userlist_enable = YES
+anonymous_enable=NO
+local_enable=YES
+write_enable=YES
+local_umask=022
+dirmessage_enable=YES
+xferlog_enable=YES
+connect_from_port_20=YES
+xferlog_std_format=YES
+listen=YES
+pam_service_name=vsftpd
+userlist_enable=YES
 userlist_file=/etc/vsftpd/vsftpd.userlist
-userlist_deny = NO
-chroot_local_user = YES
-allow_writable_chroot = YES
-tcp_wrappers = YES
-ftpd_banner = Welcome to FTP service.
-idle_session_timeout = 600
-data_connection_timeout = 120
+userlist_deny=NO
+chroot_local_user=YES
+allow_writeable_chroot=YES
+tcp_wrappers=YES
 EOF
 
 touch /etc/vsftpd/vsftpd.userlist
