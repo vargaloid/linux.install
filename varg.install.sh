@@ -74,7 +74,7 @@ case $MENU in
 
 config_vsftpd() {
 cp /etc/vsftpd/vsftpd.conf /etc/vsftpd/vsftpd.conf.orig
-cp /dev/null/ /etc/vsftpd/vsftpd.conf
+cp /dev/null /etc/vsftpd/vsftpd.conf
 cat > /etc/vsftpd/vsftpd.conf <<EOF
 anonymous_enable = NO
 local_enable = YES
@@ -128,10 +128,11 @@ systemctl enable vsftpd
 echo ""
 echo "vsftpd was successfully installed"
 echo ""
-if [ "$NEWFTPUSER" = "yes" || "$NEWFTPUSER" = "y" ]; then 
+if [[ "$NEWFTPUSER" = "yes" || "$NEWFTPUSER" = "y" ]]; then 
 	echo "User $FTPUSER was successfully added"
 	echo ""
 else
+	echo ""
 fi
 echo "Please don't forget add firewall rules for ftp! Have a nice day!" 
 echo ""
