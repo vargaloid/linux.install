@@ -74,7 +74,6 @@ case $MENU in
 
 config_vsftpd() {
 cp /etc/vsftpd/vsftpd.conf /etc/vsftpd/vsftpd.conf.orig
-cp /dev/null /etc/vsftpd/vsftpd.conf
 cat > /etc/vsftpd/vsftpd.conf <<EOF
 anonymous_enable = NO
 local_enable = YES
@@ -98,9 +97,13 @@ idle_session_timeout = 600
 data_connection_timeout = 120
 EOF
 
+touch /etc/vsftpd/vsftpd.userlist
+
 echo ""
 echo "Do you want to add new ftp user? (yes or no)"
 echo ""
+
+read NEWFTPUSER
 
 case $NEWFTPUSER in
 yes | y)
@@ -118,6 +121,7 @@ yes | y)
         read FTPHOME
 	
 	useradd -s /bin/bash -p $FTPPASS -d $FTPHOME -m $FTPUSER
+	echo "$FTPUSER" | tee -a /etc/vsftpd/vsftpd.userlist
 ;;
 *)
 esac
