@@ -1,9 +1,10 @@
 # varg.install
 Bash script to install some packages
 
-I try to learn something new and develop my skills.
-
 Works only on Debian 8, 9 and CentOS 7
+
+Version 0.05
+- added vsftpd installation
 
 Version 0.04
 - added utils installation
