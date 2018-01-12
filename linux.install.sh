@@ -139,6 +139,7 @@ yes | y)
 	
 	useradd -s /sbin/nologin -d $FTPHOME -m $FTPUSER
 	echo "$FTPUSER" > $OSVSFTPD/vsftpd.userlist
+	echo "/bin/false" >> /etc/shells
 	passwd $FTPUSER
 ;;
 *)
