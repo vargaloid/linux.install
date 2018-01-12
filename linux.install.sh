@@ -137,7 +137,7 @@ yes | y)
         echo ""
         read FTPHOME
 	
-	useradd -s /sbin/nologin -d $FTPHOME -m $FTPUSER
+	useradd -s /bin/false -d $FTPHOME -m $FTPUSER
 	echo "$FTPUSER" > $OSVSFTPD/vsftpd.userlist
 	echo "/bin/false" >> /etc/shells
 	passwd $FTPUSER
