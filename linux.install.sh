@@ -105,7 +105,7 @@ listen_ipv6=NO
 pam_service_name=vsftpd
 
 userlist_enable=YES
-userlist_file=/etc/vsftpd/vsftpd.userlist
+userlist_file=$OSVSFTPD/vsftpd.userlist
 userlist_deny=NO
 
 chroot_local_user=YES
