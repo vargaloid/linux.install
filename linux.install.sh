@@ -128,7 +128,7 @@ yes | y)
         echo ""
         read FTPHOME
 	
-	useradd -s /bin/bash -p $FTPPASS -d $FTPHOME -m $FTPUSER
+	useradd -s /sbin/nologin -p $FTPPASS -d $FTPHOME -m $FTPUSER
 	echo "$FTPUSER" | tee -a $OSVSFTPD/vsftpd.userlist
 ;;
 *)
