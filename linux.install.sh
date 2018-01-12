@@ -4,7 +4,7 @@
 # Installer by Varg. ver 0.05 #
 ###############################
 
-# Check root
+################################### 0.01 Check root ##############################
 if [ "$(id -u)" != "0" ];  then
   echo ""
   echo " ===== Hello $(whoami)! You need to be root to run this script! ===== "
@@ -17,7 +17,7 @@ else
   echo ""
 fi
 
-# Check OS TYPE & VERSION
+################################### 0.02 Check OS TYPE & VERSION #################
 if [ -f /etc/redhat-release ]; then
 	OS_RELEASE=$(cat /etc/redhat-release | awk '{print $1}')
 	OS_VERSION=$(cat /etc/os-release | grep VERSION_ID | awk -F '\"' '{print $2}')
@@ -42,16 +42,17 @@ else
 	exit 1
 fi
 
-# Main Menu
+################################### 0.03 Main Menu##################################
 echo "----------------------------------------"
 echo "|    What do you want to install?      |"
 echo "----------------------------------------"
 echo "|1. exit                               |"
 echo "|2. mc,vim,sudo,wget,net-tools,git     |"
 echo "|3. vsftpd                             |"
-echo "|4. zabbix-server                      |"
-echo "|5. OpenVPN                            |"
-echo "|6. Proxmox (Only for Debian!)         |"
+echo "|4. fail2ban-ssh                       |"
+echo "|5. zabbix-server                      |"
+echo "|6. OpenVPN                            |"
+echo "|7. Proxmox (Only for Debian!)         |"
 echo "----------------------------------------"
 
 read MENU
@@ -63,6 +64,7 @@ case $MENU in
 		echo ""
 		exit 0
 	;;
+################################### 0.04 Utils installation #########################
 	2)
 		if [ "$OS" = "CentOS7" ]; then
 			yum install mc vim sudo wget net-tools git -y
@@ -71,6 +73,7 @@ case $MENU in
 			apt-get install -y mc vim sudo wget net-tools git
 		fi
 	;;
+################################### 0.05 vsftpd installation ########################
 	3)
 
 DEBVSFTPD=/etc
@@ -158,6 +161,7 @@ echo ""
 			config_vsftpd
                 fi
         ;;
+################################### 0.06 fail2ban-ssh ###############################
 	4)
 		echo ""
                 echo "Sorry, but it doesn't ready!"
