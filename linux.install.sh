@@ -88,21 +88,34 @@ fi
 cp $OSVSFTPD/vsftpd.conf $OSVSFTPD/vsftpd.conf.orig
 cat > $OSVSFTPD/vsftpd.conf <<EOF
 anonymous_enable=NO
+
 local_enable=YES
+
 write_enable=YES
+
 local_umask=022
+
 dirmessage_enable=YES
-xferlog_enable=YES
+
 connect_from_port_20=YES
-xferlog_std_format=YES
+
 listen=YES
+listen_ipv6=NO
+
 pam_service_name=vsftpd
+
 userlist_enable=YES
 userlist_file=/etc/vsftpd/vsftpd.userlist
 userlist_deny=NO
+
 chroot_local_user=YES
+
 allow_writeable_chroot=YES
-tcp_wrappers=YES
+
+log_ftp_protocol=YES
+xferlog_enable=YES
+xferlog_std_format=NO
+vsftpd_log_file=/var/log/vsftpd.log
 EOF
 
 touch $OSVSFTPD/vsftpd.userlist
@@ -120,16 +133,13 @@ yes | y)
 	echo ""
 	read FTPUSER
 	echo ""
-        echo "Please enter password for user $FTPUSER" 
-        echo ""
-        read FTPPASS
-	echo ""
         echo "Please enter home directory for user $FTPUSER (example:/home/$FTPUSER)" 
         echo ""
         read FTPHOME
 	
-	useradd -s /sbin/nologin -p $FTPPASS -d $FTPHOME -m $FTPUSER
-	echo "$FTPUSER" | tee -a $OSVSFTPD/vsftpd.userlist
+	useradd -s /sbin/nologin -d $FTPHOME -m $FTPUSER
+	echo "$FTPUSER" > $OSVSFTPD/vsftpd.userlist
+	passwd $FTPUSER
 ;;
 *)
 esac
