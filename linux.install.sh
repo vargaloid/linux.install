@@ -47,7 +47,7 @@ echo "----------------------------------------"
 echo "|    What do you want to install?      |"
 echo "----------------------------------------"
 echo "|1. exit                               |"
-echo "|2. mc,vim,sudo,wget,net-tools,git     |"
+echo "|2. mc,vim,sudo,wget,git               |"
 echo "|3. vsftpd                             |"
 echo "|4. fail2ban-ssh                       |"
 echo "|5. zabbix-server                      |"
@@ -67,10 +67,10 @@ case $MENU in
 ################################### 0.04 Utils installation #########################
 	2)
 		if [ "$OS" = "CentOS7" ]; then
-			yum install mc vim sudo wget net-tools git -y
+			yum install mc vim sudo wget git -y
 		else
 			apt-get update
-			apt-get install -y mc vim sudo wget net-tools git
+			apt-get install -y mc vim sudo wget git
 		fi
 	;;
 ################################### 0.05 vsftpd installation ########################
