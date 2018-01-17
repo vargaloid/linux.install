@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################
-# Installer by Varg. ver 0.05 #
+# Installer by Varg. ver 0.06 #
 ###############################
 
 ################################### 0.01 Check root ##############################
@@ -173,11 +173,71 @@ echo ""
                 fi
         ;;
 ################################### 0.06 fail2ban-ssh ###############################
-	4)
-		echo ""
-                echo "Sorry, but it doesn't ready!"
-                echo ""
-	;;
+4)
+if [ "$OS" = "CentOS7" ]; then
+yum install -y fail2ban
+	cat > /etc/fail2ban/jail.local <<EOF
+[DEFAULT]
+# Ban hosts for 24 hours
+bantime = 86400 
+
+# List white addresses
+ignoreip = 127.0.0.1/8 
+
+# Time interval when fail2ban find activity (in seconds)
+findtime = 3600
+
+# Max try to login
+maxretry = 5
+
+[ssh-iptables]
+enabled = true
+filter = sshd
+action = iptables[name=ssh, port=ssh, protocol=tcp]
+logpath = /var/log/secure
+findtime = 3600
+maxretry = 5
+bantime = 86400
+EOF
+	systemctl restart fail2ban
+	systemctl enable fail2ban
+	echo ""
+	fail2ban-client status
+	echo "fail2ban was successfully installed!"
+else
+apt-get update
+apt-get install -y fail2ban
+        cat > /etc/fail2ban/jail.local <<EOF
+[DEFAULT]
+# Ban hosts for 24 hours
+bantime = 86400 
+
+# List white addresses
+ignoreip = 127.0.0.1/8 
+
+# Time interval when fail2ban find activity (in seconds)
+findtime = 3600
+
+# Max try to login
+maxretry = 5
+
+[ssh-iptables]
+enabled = true
+filter = sshd
+action = iptables[name=ssh, port=ssh, protocol=tcp]
+logpath = /var/log/auth.log
+findtime = 3600
+maxretry = 5
+bantime = 86400
+EOF
+        systemctl restart fail2ban
+        systemctl enable fail2ban
+        echo ""
+        fail2ban-client status
+        echo "fail2ban was successfully installed!"
+fi
+;;
+################################### 0.07 ############################################
 	5)
 		echo ""
 		echo "Sorry, but it doesn't ready!"
