@@ -175,7 +175,7 @@ echo ""
 ################################### 0.06 fail2ban-ssh ###############################
 4)
 if [ "$OS" = "CentOS7" ]; then
-yum install epel
+yum install epel-release
 yum install -y fail2ban
 	cat > /etc/fail2ban/jail.local <<EOF
 [DEFAULT]
