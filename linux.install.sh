@@ -258,8 +258,8 @@ config_zabbix_server () {
 	echo "DB name: ${z_s_passwd}"
 	echo ""
 
-	sed -e -i '/DBName/s/zabbix/'${z_s_db_name}'/; /DBUser/s/zabbix/'${z_s_username}'/; /AlertScriptsPath=/s/\/usr\/lib\/zabbix\/alertscripts/\/etc\/zabbix\/alertscripts/; /ExternalScripts=/s/\/usr\/lib\/zabbix\/externalscripts/\/etc\/zabbix\/externalscripts/' /etc/zabbix/zabbix_server.conf > new_server.conf
-	sed -i '/# DBPassword=/c DBPassword='${z_s_passwd}'' /etc/zabbix/zabbix_server.conf >> new_server.conf	
+	sed -e -i '/DBName/s/zabbix/${z_s_db_name}/; /DBUser/s/zabbix/${z_s_username}/; /AlertScriptsPath=/s/\/usr\/lib\/zabbix\/alertscripts/\/etc\/zabbix\/alertscripts/; /ExternalScripts=/s/\/usr\/lib\/zabbix\/externalscripts/\/etc\/zabbix\/externalscripts/' /etc/zabbix/zabbix_server.conf > new_server.conf
+	sed -i '/# DBPassword=/c DBPassword=${z_s_passwd}' /etc/zabbix/zabbix_server.conf >> new_server.conf	
 }
 			if [ "$OS" = "CentOS7" ]; then
 			rpm -ivh http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-1.el7.centos.noarch.rpm
