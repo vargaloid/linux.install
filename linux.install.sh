@@ -258,8 +258,10 @@ config_zabbix_server () {
 	echo "DB name: ${z_s_passwd}"
 	echo ""
 
-	sed -e "/DBName/s/zabbix/${z_s_db_name}/; /DBUser/s/zabbix/${z_s_username}/; /AlertScriptsPath=/s/\/usr\/lib\/zabbix\/alertscripts/\/etc\/zabbix\/alertscripts/; /ExternalScripts=/s/\/usr\/lib\/zabbix\/externalscripts/\/etc\/zabbix\/externalscripts/" /etc/zabbix/zabbix_server.conf > new_server.conf
-	sed -i "/# DBPassword=/c DBPassword=${z_s_passwd}" /etc/zabbix/zabbix_server.conf >> new_server.conf	
+	zabbix_conf=/etc/zabbix/zabbix_server.conf
+
+	sed -e "/DBName/s/zabbix/${z_s_db_name}/; /DBUser/s/zabbix/${z_s_username}/; /AlertScriptsPath=/s/\/usr\/lib\/zabbix\/alertscripts/\/etc\/zabbix\/alertscripts/; /ExternalScripts=/s/\/usr\/lib\/zabbix\/externalscripts/\/etc\/zabbix\/externalscripts/" $zabbix_conf > $zabbix_conf
+	sed -i "/# DBPassword=/c DBPassword=${z_s_passwd}" $zabbix_conf >> $zabbix_conf	
 }
 			if [ "$OS" = "CentOS7" ]; then
 			rpm -ivh http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-1.el7.centos.noarch.rpm
@@ -268,7 +270,7 @@ config_zabbix_server () {
 			systemctl enable mariadb
 			config_zabbix_server
                 else
-                        apt-get update
+                        echo "Sorry, but it doesn't ready!"
                 fi
 
 	;;
