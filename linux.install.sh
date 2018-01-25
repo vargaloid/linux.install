@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################
-# Installer by Varg. ver 0.06 #
+# Installer by Varg. ver 0.07 #
 ###############################
 
 ################################### 0.01 Check root ##############################
@@ -50,7 +50,7 @@ echo "|1. exit                               |"
 echo "|2. mc,vim,sudo,wget,git               |"
 echo "|3. vsftpd                             |"
 echo "|4. fail2ban-ssh                       |"
-echo "|5. zabbix-server                      |"
+echo "|5. zabbix-server 3.4                  |"
 echo "|6. OpenVPN                            |"
 echo "|7. Proxmox (Only for Debian!)         |"
 echo "----------------------------------------"
@@ -238,11 +238,47 @@ EOF
         echo "fail2ban was successfully installed!"
 fi
 ;;
-################################### 0.07 ############################################
+################################### 0.07 zabbix-server 3.4 ##################################
 	5)
-		echo ""
-		echo "Sorry, but it doesn't ready!"
-		echo "" 
+config_zabbix_server () {
+	echo "Please, write database name for zabbix server"
+	read z_s_db_name
+	echo "Please, write username for base ${z_s_db_name}"
+	read z_s_username
+	echo "Please, write password for user ${z_s_username}"
+	read z_s_passwd
+	mysql -u -p -e "create database ${z_s_db_name} character set utf8 collate utf8_bin;"
+	mysql -u -p -e "grant all privileges on ${z_s_db_name}.* to ${z_s_username}@localhost identified by '${z_s_passwd}';"
+	zcat /usr/share/doc/zabbix-server-mysql-3.4.0/create.sql.gz | mysql -u${z_s_username} -p ${z_s_db_name}
+
+	echo ""
+	echo "Zabbix-server:"
+	echo "DB name: ${z_s_db_name}"
+	echo "DB username: ${z_s_username}"
+	echo "DB name: ${z_s_passwd}"
+	echo ""
+
+	sed ‘s/world/sed/gi /etc/zabbix/zabbix_server.conf’
+			
+}
+			if [ "$OS" = "CentOS7" ]; then
+			rpm -ivh http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-1.el7.centos.noarch.rpm
+                        yum install -y zabbix-server-mysql zabbix-web-mysql
+			config_zabbix_server
+                else
+                        apt-get update
+                fi
+
+	;;
+	6)
+                echo ""
+                echo "Sorry, but it doesn't ready!"
+                echo ""
+	;;
+	7)
+                echo ""
+                echo "Sorry, but it doesn't ready!"
+                echo "" 
 esac
 
 exit 0
