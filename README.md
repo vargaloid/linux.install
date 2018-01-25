@@ -3,6 +3,9 @@ Bash script to install some packages
 
 Works only on Debian 8, 9 and CentOS 7
 
+Version 0.07
+- added zabbix-server 3.4 installation (not ready)
+
 Version 0.06
 - added fail2ban-ssh installation
 

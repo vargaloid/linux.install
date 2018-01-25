@@ -263,7 +263,7 @@ config_zabbix_server () {
 }
 			if [ "$OS" = "CentOS7" ]; then
 			rpm -ivh http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-1.el7.centos.noarch.rpm
-                        yum install -y zabbix-server-mysql zabbix-web-mysql mysql-server
+                        yum install -y zabbix-server-mysql zabbix-web-mysql mariadb-server
 			config_zabbix_server
                 else
                         apt-get update
