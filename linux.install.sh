@@ -241,16 +241,15 @@ fi
 ################################### 0.07 zabbix-server 3.4 ##################################
 	5)
 config_zabbix_server () {
-	echo "Please, enter database name for zabbix server"
+	echo "Please, enter database name for zabbix server:"
 	read z_s_db_name
-	echo "Please, enter username for base ${z_s_db_name}"
+	echo "Please, enter username for base ${z_s_db_name}:"
 	read z_s_username
-	echo "Please, enter password for user ${z_s_username}"
+	echo "Please, enter password for user ${z_s_username}:"
 	read z_s_passwd
 	mysql -e "create database ${z_s_db_name} character set utf8 collate utf8_bin;"
 	mysql -e "grant all privileges on ${z_s_db_name}.* to ${z_s_username}@localhost identified by '${z_s_passwd}';"
-	echo "Please, enter password for user ${z_s_username}"
-	zcat /usr/share/doc/zabbix-server-mysql-*/create.sql.gz | mysql -u${z_s_username} -p ${z_s_db_name}
+	zcat /usr/share/doc/zabbix-server-mysql-*/create.sql.gz | mysql -u${z_s_username} -p${z_s_passwd} ${z_s_db_name}
 
 	echo ""
 	echo "Zabbix-server:"
