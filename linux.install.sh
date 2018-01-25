@@ -247,8 +247,8 @@ config_zabbix_server () {
 	read z_s_username
 	echo "Please, enter password for user ${z_s_username}"
 	read z_s_passwd
-	mysql -u -p -e "create database ${z_s_db_name} character set utf8 collate utf8_bin;"
-	mysql -u -p -e "grant all privileges on ${z_s_db_name}.* to ${z_s_username}@localhost identified by '${z_s_passwd}';"
+	mysql -e "create database ${z_s_db_name} character set utf8 collate utf8_bin;"
+	mysql -e "grant all privileges on ${z_s_db_name}.* to ${z_s_username}@localhost identified by '${z_s_passwd}';"
 	echo "Please, enter password for user ${z_s_username}"
 	zcat /usr/share/doc/zabbix-server-mysql-*/create.sql.gz | mysql -u${z_s_username} -p ${z_s_db_name}
 
