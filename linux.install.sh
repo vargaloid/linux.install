@@ -241,14 +241,15 @@ fi
 ################################### 0.07 zabbix-server 3.4 ##################################
 	5)
 config_zabbix_server () {
-	echo "Please, write database name for zabbix server"
+	echo "Please, enter database name for zabbix server"
 	read z_s_db_name
-	echo "Please, write username for base ${z_s_db_name}"
+	echo "Please, enter username for base ${z_s_db_name}"
 	read z_s_username
-	echo "Please, write password for user ${z_s_username}"
+	echo "Please, enter password for user ${z_s_username}"
 	read z_s_passwd
 	mysql -u -p -e "create database ${z_s_db_name} character set utf8 collate utf8_bin;"
 	mysql -u -p -e "grant all privileges on ${z_s_db_name}.* to ${z_s_username}@localhost identified by '${z_s_passwd}';"
+	echo "Please, enter password for user ${z_s_username}"
 	zcat /usr/share/doc/zabbix-server-mysql-*/create.sql.gz | mysql -u${z_s_username} -p ${z_s_db_name}
 
 	echo ""
@@ -264,7 +265,8 @@ config_zabbix_server () {
 			if [ "$OS" = "CentOS7" ]; then
 			rpm -ivh http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-1.el7.centos.noarch.rpm
                         yum install -y zabbix-server-mysql zabbix-web-mysql mariadb-server
-			systemctl start mysql
+			systemctl start mariadb
+			systemctl enable mariadb
 			config_zabbix_server
                 else
                         apt-get update
