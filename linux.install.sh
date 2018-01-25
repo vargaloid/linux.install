@@ -249,7 +249,7 @@ config_zabbix_server () {
 	read z_s_passwd
 	mysql -u -p -e "create database ${z_s_db_name} character set utf8 collate utf8_bin;"
 	mysql -u -p -e "grant all privileges on ${z_s_db_name}.* to ${z_s_username}@localhost identified by '${z_s_passwd}';"
-	zcat /usr/share/doc/zabbix-server-mysql-3.4.0/create.sql.gz | mysql -u${z_s_username} -p ${z_s_db_name}
+	zcat /usr/share/doc/zabbix-server-mysql-*/create.sql.gz | mysql -u${z_s_username} -p ${z_s_db_name}
 
 	echo ""
 	echo "Zabbix-server:"
@@ -258,12 +258,12 @@ config_zabbix_server () {
 	echo "DB name: ${z_s_passwd}"
 	echo ""
 
-	sed ‘s/world/sed/gi /etc/zabbix/zabbix_server.conf’
+#	sed ‘s/world/sed/gi /etc/zabbix/zabbix_server.conf’
 			
 }
 			if [ "$OS" = "CentOS7" ]; then
 			rpm -ivh http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-1.el7.centos.noarch.rpm
-                        yum install -y zabbix-server-mysql zabbix-web-mysql
+                        yum install -y zabbix-server-mysql zabbix-web-mysql mysql-server
 			config_zabbix_server
                 else
                         apt-get update
