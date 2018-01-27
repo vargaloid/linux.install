@@ -271,7 +271,7 @@ config_zabbix_server () {
 	systemctl start httpd
 	systemctl enable httpd
 
-	host_ip=$(hostname -I)
+	host_ip=$(hostname -I | sed s/' '//)
 	echo ""
 	echo "Continue to setup zabbix-server 3.4 accessing the web http://${host_ip}/zabbix"
 	echo ""	
