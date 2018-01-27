@@ -259,9 +259,22 @@ config_zabbix_server () {
 	echo ""
 
 	zabbix_conf=/etc/zabbix/zabbix_server.conf
+	httpd_conf=/etc/httpd/conf.d/zabbix.conf
 
 	sed -e "/DBName/s/zabbix/${z_s_db_name}/; /DBUser/s/zabbix/${z_s_username}/; /AlertScriptsPath=/s/\/usr\/lib\/zabbix\/alertscripts/\/etc\/zabbix\/alertscripts/; /ExternalScripts=/s/\/usr\/lib\/zabbix\/externalscripts/\/etc\/zabbix\/externalscripts/" $zabbix_conf > $zabbix_conf
-	sed -i "/# DBPassword=/c DBPassword=${z_s_passwd}" $zabbix_conf >> $zabbix_conf	
+	sed -i "/# DBPassword=/c DBPassword=${z_s_passwd}" $zabbix_conf >> $zabbix_conf
+
+	timezone=(timedatectl | grep "Time zone" | awk '{print $3}')
+	sed -i "/# php_value date.timezone Europe\/Riga/c php_value date.timezone $timezone " $httpd_conf >> $httpd_conf
+	systemctl start zabbix-server
+	systemctl enable zabbix-server
+	systemctl start httpd
+	systemctl enable httpd
+
+	host_ip=(hostname -I)
+	echo ""
+	echo "Continue to setup zabbix-server 3.4 accessing the web http://${host_ip}/zabbix"
+	echo ""	
 }
 			if [ "$OS" = "CentOS7" ]; then
 			rpm -ivh http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-1.el7.centos.noarch.rpm
