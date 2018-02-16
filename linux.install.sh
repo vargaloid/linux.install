@@ -174,6 +174,7 @@ echo ""
         ;;
 ################################### 0.06 fail2ban-ssh ###############################
 4)
+
 if [ "$OS" = "CentOS7" ]; then
 yum install -y epel-release
 yum install -y fail2ban
@@ -261,7 +262,7 @@ config_zabbix_server () {
 	zabbix_conf=/etc/zabbix/zabbix_server.conf
 	httpd_conf=/etc/httpd/conf.d/zabbix.conf
 
-	sed -e "/DBName/s/zabbix/${z_s_db_name}/; /DBUser/s/zabbix/${z_s_username}/; /AlertScriptsPath=/s/\/usr\/lib\/zabbix\/alertscripts/\/etc\/zabbix\/alertscripts/; /ExternalScripts=/s/\/usr\/lib\/zabbix\/externalscripts/\/etc\/zabbix\/externalscripts/" $zabbix_conf > $zabbix_conf
+	sed -e "/DBName/s/zabbix/${z_s_db_name}/; /DBUser/s/zabbix/${z_s_username}/; /AlertScriptsPath=/s/\/usr\/lib\/zabbix\/alertscripts/\/etc\/zabbix\/alertscripts/; /ExternalScripts=/s/\/usr\/lib\/zabbix\/externalscripts/\/etc\/zabbix\/externalscripts/" $zabbix_conf >> $zabbix_conf
 	sed -i "/# DBPassword=/c DBPassword=${z_s_passwd}" $zabbix_conf >> $zabbix_conf
 
 	timezone=$(timedatectl | grep "Time zone" | awk '{print $3}')
@@ -276,7 +277,8 @@ config_zabbix_server () {
 	echo "Continue to setup zabbix-server 3.4 accessing the web http://${host_ip}/zabbix"
 	echo ""	
 }
-			if [ "$OS" = "CentOS7" ]; then
+
+		if [ "$OS" = "CentOS7" ]; then
 			rpm -ivh http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-1.el7.centos.noarch.rpm
                         yum install -y zabbix-server-mysql zabbix-web-mysql mariadb-server
 			systemctl start mariadb
@@ -287,11 +289,13 @@ config_zabbix_server () {
                 fi
 
 	;;
+################################### 0.08 ???????????????? ##################################
 	6)
                 echo ""
                 echo "Sorry, but it doesn't ready!"
                 echo ""
 	;;
+################################### 0.09 ???????????????? ##################################
 	7)
                 echo ""
                 echo "Sorry, but it doesn't ready!"
