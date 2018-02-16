@@ -262,8 +262,11 @@ config_zabbix_server () {
 	zabbix_conf=/etc/zabbix/zabbix_server.conf
 	httpd_conf=/etc/httpd/conf.d/zabbix.conf
 
-	sed -e "/DBName/s/zabbix/${z_s_db_name}/; /DBUser/s/zabbix/${z_s_username}/; /AlertScriptsPath=/s/\/usr\/lib\/zabbix\/alertscripts/\/etc\/zabbix\/alertscripts/; /ExternalScripts=/s/\/usr\/lib\/zabbix\/externalscripts/\/etc\/zabbix\/externalscripts/" $zabbix_conf >> $zabbix_conf
-	sed -i "/# DBPassword=/c DBPassword=${z_s_passwd}" $zabbix_conf >> $zabbix_conf
+	sed -i "/DBName=zabbix/c DBName=${z_s_db_name}" $zabbix_conf
+	sed -i "/DBUser=zabbix/c DBUser=${z_s_username}" $zabbix_conf
+	sed -i "/AlertScriptsPath=\/usr\/lib\/zabbix\/alertscripts/c AlertScriptsPath=\/etc\/zabbix\/alertscripts" $zabbix_conf
+	sed -i "/ExternalScripts=\/usr\/lib\/zabbix\/externalscripts/c ExternalScripts=\/etc\/zabbix\/externalscripts" $zabbix_conf
+	sed -i "/# DBPassword=/c DBPassword=${z_s_passwd}" $zabbix_conf
 
 	timezone=$(timedatectl | grep "Time zone" | awk '{print $3}')
 	sed -i "/# php_value date.timezone Europe\/Riga/c php_value date.timezone $timezone " $httpd_conf >> $httpd_conf
