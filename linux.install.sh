@@ -28,7 +28,7 @@ if [ -f /etc/redhat-release ]; then
 	OS_RELEASE=$(cat /etc/redhat-release | awk '{print $1}')
 	OS_VERSION=$(cat /etc/os-release | grep VERSION_ID | awk -F '\"' '{print $2}')
 	if [ $OS_RELEASE == CentOS ] && [ $OS_VERSION == 7 ]; then
-		OS="CentOS7"; echo -en "$C_BLUE ========== $OS ========== $C_DEF"
+		OS="CentOS7"; echo -en "$C_BLUE ========== $OS ========== $C_DEF \n"
 	else
 		echo -en "$C_RED OS not supported! $C_DEF \n"
 		exit 1
@@ -211,7 +211,7 @@ EOF
 	systemctl enable fail2ban
 	echo ""
 	fail2ban-client status
-	echo "fail2ban was successfully installed!"
+	echo -en "$C_BLUE fail2ban was successfully installed! $C_DEF \n"
 else
 apt-get update
 apt-get install -y fail2ban
