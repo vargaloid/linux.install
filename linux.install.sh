@@ -291,8 +291,12 @@ config_zabbix_server () {
 			systemctl start mariadb
 			systemctl enable mariadb
 			config_zabbix_server
+		elif [ "$OS_RELEASE" = "jessie" ]; then
+			echo "Debian 8"
+		elif [ "$OS_RELEASE" = "stretch" ]; then
+			echo "Debian 9"
                 else
-                        echo "Sorry, but it doesn't ready!"
+                        echo "Sorry, OS unknown"
                 fi
 
 	;;
