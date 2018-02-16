@@ -66,12 +66,20 @@ case $MENU in
 	;;
 ################################### 0.04 Utils installation #########################
 	2)
+echo ""
+echo "Do you really want to install mc,vim,sudo,wget,git ??? (enter yes or no)"
+echo ""
+read REALLY
+if [$REALLY = "yes" ]; then
 		if [ "$OS" = "CentOS7" ]; then
 			yum install mc vim sudo wget git -y
 		else
 			apt-get update
 			apt-get install -y mc vim sudo wget git
 		fi
+else
+	exit 0
+fi
 	;;
 ################################### 0.05 vsftpd installation ########################
 	3)
@@ -280,6 +288,7 @@ config_zabbix_server () {
 
 	host_ip=$(hostname -I | sed s/' '//)
 	echo ""
+	echo "Warning!!! firewalld disabled!!! SELINUX in Permissive mode!!!"
 	echo "Continue to setup zabbix-server 3.4 accessing the web http://${host_ip}/zabbix"
 	echo ""	
 }
