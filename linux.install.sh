@@ -292,8 +292,8 @@ config_zabbix_server () {
 			systemctl start httpd
 		        systemctl enable httpd
 		elif [ "$OS_RELEASE" = "jessie" ]; then
-			wget /tmp/http://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+jessie_all.deb
-			dpkg -i /tmp/zabbix-release_3.4-1+jessie_all.deb
+			wget http://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+jessie_all.deb
+			dpkg -i zabbix-release_3.4-1+jessie_all.deb
 			apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-server
 			systemctl start mariadb
                         systemctl enable mariadb
@@ -301,8 +301,8 @@ config_zabbix_server () {
                         systemctl start apache2
                         systemctl enable apache2
 		elif [ "$OS_RELEASE" = "stretch" ]; then
-                	wget /tmp/http://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+stretch_all.deb
-                        dpkg -i /tmp/zabbix-release_3.4-1+stretch_all.deb
+                	wget http://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+stretch_all.deb
+                        dpkg -i zabbix-release_3.4-1+stretch_all.deb
                         apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-server
                         systemctl start mariadb
                         systemctl enable mariadb
