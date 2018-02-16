@@ -4,16 +4,22 @@
 # Installer by Varg. ver 0.07 #
 ###############################
 
+C_BLUE='\033[36m'
+C_RED='\033[31m'
+C_GREEN='\033[32m'
+C_DEF='\033[0m'
+C_BOLD='\033[1m'
+
 ################################### 0.01 Check root ##############################
 if [ "$(id -u)" != "0" ];  then
   echo ""
-  echo " ===== Hello $(whoami)! You need to be root to run this script! ===== "
+  echo -en "$C_BLUE ===== Hello $(whoami)! You need to be root to run this script! ===== $C_DEF "
   echo ""
   exit 1
 else
   echo ""
-  echo " ====================== Hello $(whoami)! ======================"
-  echo " *** This script works only on CentOS 7; Debian 8, Debian 9 ***"
+  echo -en "$C_BLUE ====================== Hello $(whoami)! ====================== $C_DEF"
+  echo -en "$C_BLUE *** This script works only on CentOS 7; Debian 8, Debian 9 *** $C_DEF"
   echo ""
 fi
 
@@ -22,23 +28,23 @@ if [ -f /etc/redhat-release ]; then
 	OS_RELEASE=$(cat /etc/redhat-release | awk '{print $1}')
 	OS_VERSION=$(cat /etc/os-release | grep VERSION_ID | awk -F '\"' '{print $2}')
 	if [ $OS_RELEASE == CentOS ] && [ $OS_VERSION == 7 ]; then
-		OS="CentOS7"; echo " ========== $OS ========== "
+		OS="CentOS7"; echo -en "$C_BLUE ========== $OS ========== $C_DEF"
 	else
-		echo "OS not supported!"
+		echo -en "$C_RED OS not supported! $C_DEF"
 		exit 1
 	fi
 elif [ -f /etc/debian_version ]; then
 	OS_RELEASE=$(lsb_release -c | awk '{print $2}')
 	if [ $OS_RELEASE == jessie ]; then
-		OS="Debian8"; echo " ======= $OS $OS_RELEASE ======= "
+		OS="Debian8"; echo -en "$C_BLUE ======= $OS $OS_RELEASE ======= $C_DEF"
 	elif [ $OS_RELEASE == stretch ]; then
-                OS="Debian9"; echo " ======= $OS $OS_RELEASE ======= "
+                OS="Debian9"; echo -en "$C_BLUE ======= $OS $OS_RELEASE ======= $C_DEF"
 	else
-		echo "OS not supported!"
+		echo -en "$C_RED OS not supported! $C_DEF"
                 exit 1
 	fi
 else
-	echo "OS Unknown"
+	echo -en "$C_RED OS Unknown $C_DEF"
 	exit 1
 fi
 
@@ -60,7 +66,7 @@ read MENU
 case $MENU in
 	1)
  		echo ""
-		echo " Bye! "
+		echo -en "$C_BLUE Bye! $C_DEF"
 		echo ""
 		exit 0
 	;;
@@ -121,7 +127,7 @@ EOF
 touch $OSVSFTPD/vsftpd.userlist
 
 echo ""
-echo "Do you want to add new ftp user? (yes or no)"
+echo -en "$C_GREEN Do you want to add new ftp user? (yes or no) $C_DEF"
 echo ""
 
 read NEWFTPUSER
@@ -129,11 +135,11 @@ read NEWFTPUSER
 case $NEWFTPUSER in
 yes | y)
 	echo ""
-	echo "Please enter username" 
+	echo -en "$C_GREEN Please enter username $C_DEF" 
 	echo ""
 	read FTPUSER
 	echo ""
-        echo "Please enter home directory for user $FTPUSER (example:/home/$FTPUSER)" 
+        echo -en "$C_GREEN Please enter home directory for user $FTPUSER (example:/home/$FTPUSER) $C_DEF" 
         echo ""
         read FTPHOME
 	
@@ -149,15 +155,15 @@ systemctl restart vsftpd
 systemctl enable vsftpd
 
 echo ""
-echo "vsftpd was successfully installed"
+echo -en "$C_BLUE vsftpd was successfully installed $C_DEF"
 echo ""
 if [[ "$NEWFTPUSER" = "yes" || "$NEWFTPUSER" = "y" ]]; then 
-	echo "User $FTPUSER was successfully added"
+	echo -en "$C_BLUE User $FTPUSER was successfully added $C_DEF"
 	echo ""
 else
 	echo ""
 fi
-echo "Please don't forget add firewall rules for ftp! Have a nice day!" 
+echo -en "$C_RED Please don't forget add firewall rules for ftp! Have a nice day! $C_DEF" 
 echo ""
 netstat -tulpn | grep ftp
 echo ""
@@ -236,28 +242,28 @@ EOF
         systemctl enable fail2ban
         echo ""
         fail2ban-client status
-        echo "fail2ban was successfully installed!"
+        echo -en "$C_BLUE fail2ban was successfully installed! $C_DEF"
 fi
 ;;
 ################################### 0.07 zabbix-server 3.4 ##################################
 	5)
 config_zabbix_server () {
-	echo "Please, enter database name for zabbix server:"
+	echo -en "$C_GREEN Please, enter database name for zabbix server: $C_DEF"
 	read z_s_db_name
-	echo "Please, enter username for base ${z_s_db_name}:"
+	echo -en "$C_GREEN Please, enter username for base ${z_s_db_name}: $C_DEF"
 	read z_s_username
-	echo "Please, enter password for user ${z_s_username}:"
+	echo -en "$C_GREEN Please, enter password for user ${z_s_username}: $C_DEF"
 	read z_s_passwd
 	mysql -e "create database ${z_s_db_name} character set utf8 collate utf8_bin;"
 	mysql -e "grant all privileges on ${z_s_db_name}.* to ${z_s_username}@localhost identified by '${z_s_passwd}';"
 	zcat /usr/share/doc/zabbix-server-mysql-*/create.sql.gz | mysql -u${z_s_username} -p${z_s_passwd} ${z_s_db_name}
 
-	echo ""
+	echo -en "$C_BLUE"
 	echo "Zabbix-server:"
 	echo "DB name: ${z_s_db_name}"
 	echo "DB username: ${z_s_username}"
 	echo "DB name: ${z_s_passwd}"
-	echo ""
+	echo -en "$C_DEF"
 
 	zabbix_conf=/etc/zabbix/zabbix_server.conf
 	httpd_conf=/etc/httpd/conf.d/zabbix.conf
@@ -278,8 +284,8 @@ config_zabbix_server () {
 
 	host_ip=$(hostname -I | sed s/' '//)
 	echo ""
-	echo "Warning!!! firewalld disabled!!! SELINUX in Permissive mode!!!"
-	echo "Continue to setup zabbix-server 3.4 accessing the web http://${host_ip}/zabbix"
+	echo -en "$C_RED Warning!!! firewalld disabled!!! SELINUX in Permissive mode!!! $C_DEF"
+	echo -en "$C_BLUE Continue to setup zabbix-server 3.4 accessing the web http://${host_ip}/zabbix $C_DEF"
 	echo ""	
 }
 
