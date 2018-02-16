@@ -270,6 +270,9 @@ config_zabbix_server () {
 
 	timezone=$(timedatectl | grep "Time zone" | awk '{print $3}')
 	sed -i "/# php_value date.timezone Europe\/Riga/c php_value date.timezone $timezone " $httpd_conf >> $httpd_conf
+	setenforce Permissive
+	systemctl stop firewalld
+	systemctl disable firewalld
 	systemctl start zabbix-server
 	systemctl enable zabbix-server
 	systemctl start httpd
