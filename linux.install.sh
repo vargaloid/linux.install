@@ -276,9 +276,7 @@ config_zabbix_server () {
 
 	timezone=$(timedatectl | grep "Time zone" | awk '{print $3}')
 	sed -i "/# php_value date.timezone Europe\/Riga/c php_value date.timezone $timezone " $httpd_conf >> $httpd_conf
-	setenforce Permissive
-	systemctl stop firewalld
-	systemctl disable firewalld
+	
 	systemctl start zabbix-server
 	systemctl enable zabbix-server
 
@@ -295,23 +293,26 @@ config_zabbix_server () {
 			systemctl start mariadb
 			systemctl enable mariadb
 			config_zabbix_server
+			setenforce Permissive
+		        systemctl stop firewalld
+		        systemctl disable firewalld
 			systemctl start httpd
 		        systemctl enable httpd
 		elif [ "$OS_RELEASE" = "jessie" ]; then
 			wget http://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+jessie_all.deb
 			dpkg -i zabbix-release_3.4-1+jessie_all.deb
-			apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-server
-			systemctl start mariadb
-                        systemctl enable mariadb
+			apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mysql-server
+			systemctl start mysql-server
+                        systemctl enable mysql-server
                         config_zabbix_server
                         systemctl start apache2
                         systemctl enable apache2
 		elif [ "$OS_RELEASE" = "stretch" ]; then
                 	wget http://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+stretch_all.deb
                         dpkg -i zabbix-release_3.4-1+stretch_all.deb
-                        apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-server
-                        systemctl start mariadb
-                        systemctl enable mariadb
+                        apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mysql-server
+                        systemctl start mysql-server
+                        systemctl enable mysql-server
                         config_zabbix_server
                         systemctl start apache2
                         systemctl enable apache2
