@@ -259,7 +259,7 @@ config_zabbix_server () {
 	read z_s_passwd
 	mysql -e "create database ${z_s_db_name} character set utf8 collate utf8_bin;"
 	mysql -e "grant all privileges on ${z_s_db_name}.* to ${z_s_username}@localhost identified by '${z_s_passwd}';"
-	zcat /usr/share/doc/zabbix-server-mysql-*/create.sql.gz | mysql -u${z_s_username} -p${z_s_passwd} ${z_s_db_name}
+	zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -u${z_s_username} -p${z_s_passwd} ${z_s_db_name}
 
 	echo -en "$C_BLUE \n"
 	echo "Zabbix-server:"
