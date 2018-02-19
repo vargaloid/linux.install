@@ -10,6 +10,8 @@ C_GREEN='\033[32m'
 C_DEF='\033[0m'
 C_BOLD='\033[1m'
 
+exec 2>lin.inst.errors.log
+
 ################################### 0.01 Check root ##############################
 if [ "$(id -u)" != "0" ];  then
   echo ""
