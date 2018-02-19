@@ -12,6 +12,24 @@ C_BOLD='\033[1m'
 
 exec 2>lin.inst.errors.log
 
+logfile () {
+
+echo ""
+echo -en "$C_GREEN Do you want to see error log? (yes or no) $C_DEF"
+echo ""
+
+read LOGFILE
+
+case $LOGFILE in
+yes | y)
+	less lin.inst.errors.log
+	;;
+no | n)
+	exit 0
+esac
+
+}
+
 ################################### 0.01 Check root ##############################
 if [ "$(id -u)" != "0" ];  then
   echo ""
@@ -70,15 +88,17 @@ case $MENU in
  		echo ""
 		echo -en "$C_BLUE Bye! $C_DEF \n"
 		echo ""
-		exit 0
+		logfile
 	;;
 ################################### 0.04 Utils installation #########################
 	2)
 		if [ "$OS" = "CentOS7" ]; then
 			yum install mc vim sudo wget git -y
+			logfile
 		else
 			apt-get update
 			apt-get install -y mc vim sudo wget git
+			logfile
 		fi
 	;;
 ################################### 0.05 vsftpd installation ########################
@@ -174,10 +194,12 @@ echo ""
 		if [ "$OS" = "CentOS7" ]; then
                         yum install -y vsftpd
 			config_vsftpd
+			logfile
                 else
                         apt-get update
                         apt-get install -y vsftpd
 			config_vsftpd
+			logfile
                 fi
         ;;
 ################################### 0.06 fail2ban-ssh ###############################
@@ -214,6 +236,7 @@ EOF
 	echo ""
 	fail2ban-client status
 	echo -en "$C_BLUE fail2ban was successfully installed! $C_DEF \n"
+	logfile
 else
 apt-get update
 apt-get install -y fail2ban
@@ -245,6 +268,7 @@ EOF
         echo ""
         fail2ban-client status
         echo -en "$C_BLUE fail2ban was successfully installed! $C_DEF \n"
+	logfile
 fi
 ;;
 ################################### 0.07 zabbix-server 3.4 ##################################
@@ -322,6 +346,8 @@ create_my.cnf () {
 		        systemctl enable mariadb
 
 			config_zabbix_server
+			logfile
+
 		elif [ "$OS_RELEASE" = "jessie" ]; then
 			wget http://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+jessie_all.deb
 			dpkg -i zabbix-release_3.4-1+jessie_all.deb
@@ -330,6 +356,7 @@ create_my.cnf () {
 
 			create_my.cnf
                         config_zabbix_server
+			logfile
 
 		elif [ "$OS_RELEASE" = "stretch" ]; then
                 	wget http://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+stretch_all.deb
@@ -338,6 +365,7 @@ create_my.cnf () {
 			systemctl enable mariadb
 	
 			config_zabbix_server
+			logfile
 
 		else
                         echo "Sorry, OS unknown"
