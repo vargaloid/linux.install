@@ -248,6 +248,9 @@ fi
 ################################### 0.07 zabbix-server 3.4 ##################################
 	5)
 config_zabbix_server () {
+	systemctl start mariadb
+        systemctl enable mariadb
+
 	echo -en "$C_GREEN Please, enter database name for zabbix server: $C_DEF \n"
 	read z_s_db_name
 	echo -en "$C_GREEN Please, enter username for base ${z_s_db_name}: $C_DEF \n"
@@ -266,7 +269,11 @@ config_zabbix_server () {
 	echo -en "$C_DEF \n"
 
 	zabbix_conf=/etc/zabbix/zabbix_server.conf
-	httpd_conf=/etc/httpd/conf.d/zabbix.conf
+	if [ "$OS" = "CentOS7" ]; then
+		httpd_conf=/etc/httpd/conf.d/zabbix.conf
+	else
+		httpd_conf=/etc/apache2/conf-available/zabbix.conf
+	fi
 
 	sed -i "/DBName=zabbix/c DBName=${z_s_db_name}" $zabbix_conf
 	sed -i "/DBUser=zabbix/c DBUser=${z_s_username}" $zabbix_conf
@@ -280,6 +287,17 @@ config_zabbix_server () {
 	systemctl start zabbix-server
 	systemctl enable zabbix-server
 
+	if [ "$OS" = "CentOS7" ]; then
+		setenforce Permissive
+        	systemctl stop firewalld
+	        systemctl disable firewalld
+		systemctl start httpd
+	        systemctl enable httpd
+	else
+		systemctl start apache2
+                systemctl enable apache2
+	fi
+
 	host_ip=$(hostname -I | sed s/' '//)
 	echo ""
 	echo -en "$C_RED Warning!!! firewalld disabled!!! SELINUX in Permissive mode!!! $C_DEF \n"
@@ -287,35 +305,36 @@ config_zabbix_server () {
 	echo ""	
 }
 
+create_my.cnf () {
+	echo ""
+	echo -en "$C_BLUE Create .my.cnf $C_DEF \n"
+	echo -en "$C_GREEN Please, repeat password for MariaDB: $C_DEF \n"
+	echo ""
+	read MDB_PASS
+	echo "[client]" > /root/.my.cnf
+	echo "password = $MDB_PASS" >> /root/.my.cnf
+}
+
 		if [ "$OS" = "CentOS7" ]; then
 			rpm -ivh http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-1.el7.centos.noarch.rpm
                         yum install -y zabbix-server-mysql zabbix-web-mysql mariadb-server
-			systemctl start mariadb
-			systemctl enable mariadb
 			config_zabbix_server
-			setenforce Permissive
-		        systemctl stop firewalld
-		        systemctl disable firewalld
-			systemctl start httpd
-		        systemctl enable httpd
 		elif [ "$OS_RELEASE" = "jessie" ]; then
 			wget http://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+jessie_all.deb
 			dpkg -i zabbix-release_3.4-1+jessie_all.deb
-			apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mysql-server
-			systemctl start mysql-server
-                        systemctl enable mysql-server
+			apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-server
+
+			create_my.cnf	
                         config_zabbix_server
-                        systemctl start apache2
-                        systemctl enable apache2
+
 		elif [ "$OS_RELEASE" = "stretch" ]; then
                 	wget http://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+stretch_all.deb
                         dpkg -i zabbix-release_3.4-1+stretch_all.deb
-                        apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mysql-server
-                        systemctl start mysql-server
-                        systemctl enable mysql-server
-                        config_zabbix_server
-                        systemctl start apache2
-                        systemctl enable apache2
+                        apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-servre
+			
+			create_my.cnf                        
+			config_zabbix_server
+
 		else
                         echo "Sorry, OS unknown"
                 fi
@@ -325,6 +344,9 @@ config_zabbix_server () {
 	6)
                 echo ""
                 echo "Sorry, but it doesn't ready!"
+                        systemctl enable apache2
+                        systemctl enable apache2
+                        systemctl enable apache2
                 echo ""
 	;;
 ################################### 0.09 ???????????????? ##################################
