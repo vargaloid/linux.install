@@ -330,7 +330,7 @@ create_my.cnf () {
 		elif [ "$OS_RELEASE" = "stretch" ]; then
                 	wget http://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+stretch_all.deb
                         dpkg -i zabbix-release_3.4-1+stretch_all.deb
-                        apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-servre
+                        apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-server
 			
 			create_my.cnf                        
 			config_zabbix_server
@@ -344,9 +344,6 @@ create_my.cnf () {
 	6)
                 echo ""
                 echo "Sorry, but it doesn't ready!"
-                        systemctl enable apache2
-                        systemctl enable apache2
-                        systemctl enable apache2
                 echo ""
 	;;
 ################################### 0.09 ???????????????? ##################################
