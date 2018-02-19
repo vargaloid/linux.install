@@ -248,8 +248,6 @@ fi
 ################################### 0.07 zabbix-server 3.4 ##################################
 	5)
 config_zabbix_server () {
-	systemctl start mariadb
-        systemctl enable mariadb
 
 	echo -en "$C_GREEN Please, enter database name for zabbix server: $C_DEF \n"
 	read z_s_db_name
