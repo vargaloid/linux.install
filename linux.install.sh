@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################
-# Installer by Varg. ver 0.08 #
+# Installer by Varg. ver 0.07 #
 ###############################
 
 C_BLUE='\033[36m'
@@ -385,13 +385,10 @@ fi
                 fi
 
 	;;
-################################### 0.08 OpenVPN ##################################
+################################### 0.08 ?????? ##################################
 	6)
 		if [ "$OS" = "CentOS7" ]; then
-                        change_SE
-			yum install ‐y epel-release
-			yum install -y iptables-services openvpn easy-rsa
-
+			echo "Sorry, but it doesn't ready!"
                 else
                         echo ""
                         echo "Sorry, but it doesn't ready!"
