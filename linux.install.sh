@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################
-# Installer by Varg. ver 0.07 #
+# Installer by Varg. ver 7.02 #
 ###############################
 
 C_BLUE='\033[36m'
@@ -32,6 +32,11 @@ no | n)
 esac
 
 }
+
+############## AreYouSure function #############
+read -n 1 -p "Do you really want to select this? (y/[a]): " AMSure 
+[ "$AMSure" = "y" ] || exit
+echo "" 1>&2
 
 ############### SELINUX Permissive function ##################
 change_SE () {
@@ -193,7 +198,7 @@ create_my.cnf () {
 	echo "password = $MDB_PASS" >> /root/.my.cnf
 }
 
-################################### 0.01 Check root ##############################
+################################### 1.01 Check root ##############################
 if [ "$(id -u)" != "0" ];  then
   echo ""
   echo -en "$C_BLUE ===== Hello $(whoami)! You need to be root to run this script! ===== $C_DEF \n"
@@ -206,7 +211,7 @@ else
   echo ""
 fi
 
-################################### 0.02 Check OS TYPE & VERSION #################
+################################### 2.01 Check OS TYPE & VERSION #################
 if [ -f /etc/redhat-release ]; then
 	OS_RELEASE=$(cat /etc/redhat-release | awk '{print $1}')
 	OS_VERSION=$(cat /etc/os-release | grep VERSION_ID | awk -F '\"' '{print $2}')
@@ -231,7 +236,7 @@ else
 	exit 1
 fi
 
-################################### 0.03 Main Menu##################################
+################################### 3.01 Main Menu##################################
 echo "----------------------------------------"
 echo "|    What do you want to install?      |"
 echo "----------------------------------------"
@@ -253,8 +258,9 @@ case $MENU in
 		echo ""
 		logfile
 	;;
-################################### 0.04 Utils installation #########################
+################################### 4.01 Utils installation #########################
 	2)
+		AMSure
 		if [ "$OS" = "CentOS7" ]; then
 			yum install mc vim sudo wget git -y
 			logfile
@@ -264,9 +270,10 @@ case $MENU in
 			logfile
 		fi
 	;;
-################################### 0.05 vsftpd installation ########################
+################################### 5.01 vsftpd installation ########################
 	3)
 
+		AMSure
 DEBVSFTPD=/etc
 CENTOSVSFTPD=/etc/vsftpd
 
@@ -281,9 +288,10 @@ CENTOSVSFTPD=/etc/vsftpd
 			logfile
                 fi
         ;;
-################################### 0.06 fail2ban-ssh ###############################
+################################### 6.01 fail2ban-ssh ###############################
 4)
 
+		AMSure
 if [ "$OS" = "CentOS7" ]; then
 yum install -y epel-release
 yum install -y fail2ban
@@ -350,8 +358,10 @@ EOF
 	logfile
 fi
 ;;
-################################### 0.07 zabbix-server 3.4 ##################################
+################################### 7.01 zabbix-server 3.4 ##################################
 	5)
+
+		AMSure
 		if [ "$OS" = "CentOS7" ]; then
 			rpm -ivh http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-1.el7.centos.noarch.rpm
                         yum install -y zabbix-server-mysql zabbix-web-mysql mariadb-server	
@@ -385,8 +395,9 @@ fi
                 fi
 
 	;;
-################################### 0.08 ?????? ##################################
+################################### 8.01 ?????? ##################################
 	6)
+		AMSure
 		if [ "$OS" = "CentOS7" ]; then
 			echo "Sorry, but it doesn't ready!"
                 else
@@ -395,8 +406,9 @@ fi
                         echo ""
                 fi
 	;;
-################################### 0.09 ???????????????? ##################################
+################################### 9.01 ???????????????? ##################################
 	7)
+		AMSure
                 echo ""
                 echo "Sorry, but it doesn't ready!"
                 echo "" 
