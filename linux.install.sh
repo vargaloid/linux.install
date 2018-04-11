@@ -34,9 +34,11 @@ esac
 }
 
 ############## AreYouSure function #############
+AreYouSure () {
 read -n 1 -p "Do you really want to select this? (y/[a]): " AMSure 
 [ "$AMSure" = "y" ] || exit
 echo "" 1>&2
+}
 
 ############### SELINUX Permissive function ##################
 change_SE () {
@@ -260,7 +262,7 @@ case $MENU in
 	;;
 ################################### 4.01 Utils installation #########################
 	2)
-		AMSure
+		AreYouSure
 		if [ "$OS" = "CentOS7" ]; then
 			yum install mc vim sudo wget git -y
 			logfile
@@ -273,7 +275,7 @@ case $MENU in
 ################################### 5.01 vsftpd installation ########################
 	3)
 
-		AMSure
+		AreYouSure
 DEBVSFTPD=/etc
 CENTOSVSFTPD=/etc/vsftpd
 
@@ -291,7 +293,7 @@ CENTOSVSFTPD=/etc/vsftpd
 ################################### 6.01 fail2ban-ssh ###############################
 4)
 
-		AMSure
+		AreYouSure
 if [ "$OS" = "CentOS7" ]; then
 yum install -y epel-release
 yum install -y fail2ban
@@ -361,7 +363,7 @@ fi
 ################################### 7.01 zabbix-server 3.4 ##################################
 	5)
 
-		AMSure
+		AreYouSure
 		if [ "$OS" = "CentOS7" ]; then
 			rpm -ivh http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-1.el7.centos.noarch.rpm
                         yum install -y zabbix-server-mysql zabbix-web-mysql mariadb-server	
@@ -397,7 +399,7 @@ fi
 	;;
 ################################### 8.01 ?????? ##################################
 	6)
-		AMSure
+		AreYouSure
 		if [ "$OS" = "CentOS7" ]; then
 			echo "Sorry, but it doesn't ready!"
                 else
@@ -408,7 +410,7 @@ fi
 	;;
 ################################### 9.01 ???????????????? ##################################
 	7)
-		AMSure
+		AreYouSure
                 echo ""
                 echo "Sorry, but it doesn't ready!"
                 echo "" 
