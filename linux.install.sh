@@ -35,9 +35,15 @@ esac
 
 ############## AreYouSure function #############
 AreYouSure () {
-read -n 1 -p "Do you really want to select this? (y/[a]): " AMSure 
-[ "$AMSure" = "y" ] || exit
-echo "" 1>&2
+echo -n "Do you really want to select this? (N/y): "
+read -n 1 AMSure
+case "$AMSure" in
+    y|Y) echo "Ok! Let's do it!..."
+        ;;
+    *) echo "Bye! :)"
+        exit 0
+        ;;
+esac
 }
 
 ############### SELINUX Permissive function ##################
