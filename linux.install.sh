@@ -38,9 +38,11 @@ AreYouSure () {
 echo -n "Do you really want to select this? (N/y): "
 read -n 1 AMSure
 case "$AMSure" in
-    y|Y) echo -n "Ok! Let's do it!..."
+    y|Y) echo "" 
+	 echo "Ok! Let's do it!..."
         ;;
-    *) echo -n "Bye! :)"
+    *)   echo ""
+	 echo "Bye! :)"
         exit 0
         ;;
 esac
