@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################
-# Installer by Varg. ver 7.02 #
+# Installer by Varg. ver 8.02 #
 ###############################
 
 C_BLUE='\033[36m'
@@ -406,14 +406,34 @@ fi
                 fi
 
 	;;
-################################### 8.01 ?????? ##################################
+################################### 8.02 Docker #####################################
 	6)
+### Docker function ###
+DockerStart () {
+systemctl start docker.service 
+systemctl enable docker.service
+systemctl status docker.service
+}
+### End Docker function ###
 		AreYouSure
 		if [ "$OS" = "CentOS7" ]; then
-			echo "Sorry, but it doesn't ready!"
+			yum install -y yum-utils device-mapper-persistent-data lvm2
+			yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+			yum install docker-ce
+			DockerStart
+			logfile
+		elif [ $OS == "Debian8" || $OS == "Debian9" ]; then
+			apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common
+			curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+			apt-key fingerprint 0EBFCD88
+			add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+			apt-get update
+			apt-get install docker-ce
+			DockerStart
+			logfile
                 else
                         echo ""
-                        echo "Sorry, but it doesn't ready!"
+                        echo "Sorry, your OS is not supported"
                         echo ""
                 fi
 	;;
