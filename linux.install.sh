@@ -40,9 +40,11 @@ read -n 1 AMSure
 case "$AMSure" in
     y|Y) echo "" 
 	 echo "Ok! Let's do it!..."
+	 echo ""
         ;;
     *)   echo ""
 	 echo "Bye! :)"
+	 echo "" 
         exit 0
         ;;
 esac
