@@ -257,7 +257,7 @@ echo "|2. mc,vim,sudo,wget,git               |"
 echo "|3. vsftpd                             |"
 echo "|4. fail2ban-ssh                       |"
 echo "|5. zabbix-server 3.4                  |"
-echo "|6. OpenVPN                            |"
+echo "|6. Docker                             |"
 echo "|7. Proxmox (Only for Debian!)         |"
 echo "----------------------------------------"
 
