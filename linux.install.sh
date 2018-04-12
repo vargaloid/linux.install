@@ -235,9 +235,9 @@ if [ -f /etc/redhat-release ]; then
 	fi
 elif [ -f /etc/debian_version ]; then
 	OS_RELEASE=$(lsb_release -c | awk '{print $2}')
-	if [ $OS_RELEASE == "jessie" ]; then
+	if [[ $(lsb_release -cs) == 'jessie' ]]; then
 		OS="Debian8"; echo -en "$C_BLUE ======= $OS $OS_RELEASE ======= $C_DEF \n"
-	elif [ $OS_RELEASE == "stretch" ]; then
+	elif [[ $(lsb_release -cs) == 'stretch'  ]]; then
                 OS="Debian9"; echo -en "$C_BLUE ======= $OS $OS_RELEASE ======= $C_DEF \n"
 	else
 		echo -en "$C_RED OS not supported! $C_DEF \n"
@@ -422,7 +422,7 @@ systemctl status docker.service
 			yum install -y docker-ce
 			DockerStart
 			logfile
-		elif [ $OS == "Debian8" || $OS == "Debian9" ]; then
+		elif [[ $OS == "Debian8" || $OS == "Debian9" ]]; then
 			apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common
 			curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
 			apt-key fingerprint 0EBFCD88
