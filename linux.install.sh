@@ -18,16 +18,16 @@ exec 2>lin.inst.errors.log
 logfile () {
 
 echo ""
-echo -en "$C_GREEN Do you want to see error log? (yes or no) $C_DEF"
+echo -en "$C_GREEN Do you want to see error log? (y/N) $C_DEF"
 echo ""
 
 read LOGFILE
 
 case $LOGFILE in
-yes | y)
+Y|y)
 	less lin.inst.errors.log
 	;;
-no | n)
+*)
 	exit 0
 esac
 
@@ -38,9 +38,9 @@ AreYouSure () {
 echo -n "Do you really want to select this? (N/y): "
 read -n 1 AMSure
 case "$AMSure" in
-    y|Y) echo "Ok! Let's do it!..."
+    y|Y) echo -n "Ok! Let's do it!..."
         ;;
-    *) echo "Bye! :)"
+    *) echo -n "Bye! :)"
         exit 0
         ;;
 esac
@@ -264,7 +264,6 @@ case $MENU in
  		echo ""
 		echo -en "$C_BLUE Bye! $C_DEF \n"
 		echo ""
-		logfile
 	;;
 ################################### 4.01 Utils installation #########################
 	2)
