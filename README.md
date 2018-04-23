@@ -3,6 +3,9 @@ Bash script to install some packages
 
 Works only on Debian 8, 9 and CentOS 7
 
+Version 9.02
+- added Proxmox VE installation (work in progress)
+
 Version 8.02
 - added Docker installation
 

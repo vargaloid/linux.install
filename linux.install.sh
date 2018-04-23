@@ -14,7 +14,7 @@ C_BOLD='\033[1m'
 exec 2>lin.inst.errors.log
 
 ############################ FUNCTIONS #########################################
-############## Log Func #################
+### Log Func ###
 logfile () {
 
 echo ""
@@ -33,7 +33,7 @@ esac
 
 }
 
-############## AreYouSure function #############
+### AreYouSure function ###
 AreYouSure () {
 echo -n "Do you really want to select this? (N/y): "
 read -n 1 AMSure
@@ -50,13 +50,97 @@ case "$AMSure" in
 esac
 }
 
-############### SELINUX Permissive function ##################
+### SELINUX Permissive function ###
 change_SE () {
         setenforce Permissive
         sed -i "/SELINUX=enforcing/c SELINUX=permissive" /etc/selinux/config
 }
 
-############### Vsftpd installation function #################
+### Create .my.cnf function ###
+create_my.cnf () {
+	echo ""
+	echo -en "$C_BLUE Create .my.cnf $C_DEF \n"
+	echo -en "$C_GREEN Please, repeat password for MariaDB: $C_DEF \n"
+	echo ""
+	read MDB_PASS
+	echo "[client]" > /root/.my.cnf
+	echo "password = $MDB_PASS" >> /root/.my.cnf
+}
+
+################################### 1.01 Check root ##############################
+if [ "$(id -u)" != "0" ];  then
+  echo ""
+  echo -en "$C_BLUE ===== Hello $(whoami)! You need to be root to run this script! ===== $C_DEF \n"
+  echo ""
+  exit 1
+else
+  echo ""
+  echo -en "$C_BLUE ====================== Hello $(whoami)! ====================== $C_DEF \n"
+  echo -en "$C_BLUE *** This script works only on CentOS 7; Debian 8, Debian 9 *** $C_DEF \n"
+  echo ""
+fi
+
+################################### 2.01 Check OS TYPE & VERSION #################
+if [ -f /etc/redhat-release ]; then
+	OS_RELEASE=$(cat /etc/redhat-release | awk '{print $1}')
+	OS_VERSION=$(cat /etc/os-release | grep VERSION_ID | awk -F '\"' '{print $2}')
+	if [ $OS_RELEASE == CentOS ] && [ $OS_VERSION == 7 ]; then
+		OS="CentOS7"; echo -en "$C_BLUE ========== $OS ========== $C_DEF \n"
+	else
+		echo -en "$C_RED OS not supported! $C_DEF \n"
+		exit 1
+	fi
+elif [ -f /etc/debian_version ]; then
+	OS_RELEASE=$(lsb_release -c | awk '{print $2}')
+	if [[ $(lsb_release -cs) == 'jessie' ]]; then
+		OS="Debian8"; echo -en "$C_BLUE ======= $OS $OS_RELEASE ======= $C_DEF \n"
+	elif [[ $(lsb_release -cs) == 'stretch'  ]]; then
+                OS="Debian9"; echo -en "$C_BLUE ======= $OS $OS_RELEASE ======= $C_DEF \n"
+	else
+		echo -en "$C_RED OS not supported! $C_DEF \n"
+                exit 1
+	fi
+else
+	echo -en "$C_RED OS Unknown $C_DEF \n"
+	exit 1
+fi
+
+################################### 3.01 Main Menu##################################
+echo "----------------------------------------"
+echo "|    What do you want to install?      |"
+echo "----------------------------------------"
+echo "|1. exit                               |"
+echo "|2. mc,vim,sudo,wget,git               |"
+echo "|3. vsftpd                             |"
+echo "|4. fail2ban-ssh                       |"
+echo "|5. zabbix-server 3.4                  |"
+echo "|6. Docker                             |"
+echo "|7. Proxmox VE (Only for Debian 9!)    |"
+echo "----------------------------------------"
+
+read MENU
+
+case $MENU in
+	1)
+ 		echo ""
+		echo -en "$C_BLUE Bye! $C_DEF \n"
+		echo ""
+	;;
+################################### 4.01 Utils installation #########################
+	2)
+		AreYouSure
+		if [ "$OS" = "CentOS7" ]; then
+			yum install mc vim sudo wget git -y
+			logfile
+		else
+			apt-get update
+			apt-get install -y mc vim sudo wget git
+			logfile
+		fi
+	;;
+################################### 5.01 vsftpd installation ########################
+	3)
+### Vsftpd installation function ###
 config_vsftpd() {
 if [ "$OS" = "CentOS7" ]; then
 OSVSFTPD=$CENTOSVSFTPD
@@ -142,148 +226,7 @@ echo ""
 
 }
 
-################################# Zabbix-server setup function #####################
-config_zabbix_server () {
-
-	echo -en "$C_GREEN Please, enter database name for zabbix server: $C_DEF \n"
-	read z_s_db_name
-	echo -en "$C_GREEN Please, enter username for base ${z_s_db_name}: $C_DEF \n"
-	read z_s_username
-	echo -en "$C_GREEN Please, enter password for user ${z_s_username}: $C_DEF \n"
-	read z_s_passwd
-	mysql -e "create database ${z_s_db_name} character set utf8 collate utf8_bin;"
-	mysql -e "grant all privileges on ${z_s_db_name}.* to ${z_s_username}@localhost identified by '${z_s_passwd}';"
-	zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -u${z_s_username} -p${z_s_passwd} ${z_s_db_name}
-
-	echo -en "$C_BLUE \n"
-	echo "Zabbix-server:"
-	echo "DB name: ${z_s_db_name}"
-	echo "DB username: ${z_s_username}"
-	echo "DB name: ${z_s_passwd}"
-	echo -en "$C_DEF \n"
-
-	zabbix_conf=/etc/zabbix/zabbix_server.conf
-	if [ "$OS" = "CentOS7" ]; then
-		httpd_conf=/etc/httpd/conf.d/zabbix.conf
-	else
-		httpd_conf=/etc/apache2/conf-available/zabbix.conf
-	fi
-
-	sed -i "/DBName=zabbix/c DBName=${z_s_db_name}" $zabbix_conf
-	sed -i "/DBUser=zabbix/c DBUser=${z_s_username}" $zabbix_conf
-	sed -i "/AlertScriptsPath=\/usr\/lib\/zabbix\/alertscripts/c AlertScriptsPath=\/etc\/zabbix\/alertscripts" $zabbix_conf
-	sed -i "/ExternalScripts=\/usr\/lib\/zabbix\/externalscripts/c ExternalScripts=\/etc\/zabbix\/externalscripts" $zabbix_conf
-	sed -i "/# DBPassword=/c DBPassword=${z_s_passwd}" $zabbix_conf
-
-	timezone=$(timedatectl | grep "Time zone" | awk '{print $3}')
-	sed -i "/# php_value date.timezone Europe\/Riga/c php_value date.timezone $timezone " $httpd_conf >> $httpd_conf
-	
-	systemctl start zabbix-server
-	systemctl enable zabbix-server
-
-	if [ "$OS" = "CentOS7" ]; then
-		setenforce Permissive
-        	systemctl stop firewalld
-	        systemctl disable firewalld
-		systemctl start httpd
-	        systemctl enable httpd
-	else
-		systemctl restart apache2
-                systemctl enable apache2
-	fi
-
-	host_ip=$(hostname -I | sed s/' '//)
-	echo ""
-	echo -en "$C_RED Warning!!! firewalld disabled!!! SELINUX in Permissive mode!!! $C_DEF \n"
-	echo -en "$C_BLUE Continue to setup zabbix-server 3.4 accessing the web http://${host_ip}/zabbix $C_DEF \n"
-	echo ""	
-}
-
-############################### Create .my.cnf function ################################
-create_my.cnf () {
-	echo ""
-	echo -en "$C_BLUE Create .my.cnf $C_DEF \n"
-	echo -en "$C_GREEN Please, repeat password for MariaDB: $C_DEF \n"
-	echo ""
-	read MDB_PASS
-	echo "[client]" > /root/.my.cnf
-	echo "password = $MDB_PASS" >> /root/.my.cnf
-}
-
-################################### 1.01 Check root ##############################
-if [ "$(id -u)" != "0" ];  then
-  echo ""
-  echo -en "$C_BLUE ===== Hello $(whoami)! You need to be root to run this script! ===== $C_DEF \n"
-  echo ""
-  exit 1
-else
-  echo ""
-  echo -en "$C_BLUE ====================== Hello $(whoami)! ====================== $C_DEF \n"
-  echo -en "$C_BLUE *** This script works only on CentOS 7; Debian 8, Debian 9 *** $C_DEF \n"
-  echo ""
-fi
-
-################################### 2.01 Check OS TYPE & VERSION #################
-if [ -f /etc/redhat-release ]; then
-	OS_RELEASE=$(cat /etc/redhat-release | awk '{print $1}')
-	OS_VERSION=$(cat /etc/os-release | grep VERSION_ID | awk -F '\"' '{print $2}')
-	if [ $OS_RELEASE == CentOS ] && [ $OS_VERSION == 7 ]; then
-		OS="CentOS7"; echo -en "$C_BLUE ========== $OS ========== $C_DEF \n"
-	else
-		echo -en "$C_RED OS not supported! $C_DEF \n"
-		exit 1
-	fi
-elif [ -f /etc/debian_version ]; then
-	OS_RELEASE=$(lsb_release -c | awk '{print $2}')
-	if [[ $(lsb_release -cs) == 'jessie' ]]; then
-		OS="Debian8"; echo -en "$C_BLUE ======= $OS $OS_RELEASE ======= $C_DEF \n"
-	elif [[ $(lsb_release -cs) == 'stretch'  ]]; then
-                OS="Debian9"; echo -en "$C_BLUE ======= $OS $OS_RELEASE ======= $C_DEF \n"
-	else
-		echo -en "$C_RED OS not supported! $C_DEF \n"
-                exit 1
-	fi
-else
-	echo -en "$C_RED OS Unknown $C_DEF \n"
-	exit 1
-fi
-
-################################### 3.01 Main Menu##################################
-echo "----------------------------------------"
-echo "|    What do you want to install?      |"
-echo "----------------------------------------"
-echo "|1. exit                               |"
-echo "|2. mc,vim,sudo,wget,git               |"
-echo "|3. vsftpd                             |"
-echo "|4. fail2ban-ssh                       |"
-echo "|5. zabbix-server 3.4                  |"
-echo "|6. Docker                             |"
-echo "|7. Proxmox (Only for Debian!)         |"
-echo "----------------------------------------"
-
-read MENU
-
-case $MENU in
-	1)
- 		echo ""
-		echo -en "$C_BLUE Bye! $C_DEF \n"
-		echo ""
-	;;
-################################### 4.01 Utils installation #########################
-	2)
-		AreYouSure
-		if [ "$OS" = "CentOS7" ]; then
-			yum install mc vim sudo wget git -y
-			logfile
-		else
-			apt-get update
-			apt-get install -y mc vim sudo wget git
-			logfile
-		fi
-	;;
-################################### 5.01 vsftpd installation ########################
-	3)
-
+### vsftpd proccess ###
 		AreYouSure
 DEBVSFTPD=/etc
 CENTOSVSFTPD=/etc/vsftpd
@@ -371,7 +314,64 @@ fi
 ;;
 ################################### 7.01 zabbix-server 3.4 ##################################
 	5)
+### Zabbix-server setup function ###
+config_zabbix_server () {
 
+	echo -en "$C_GREEN Please, enter database name for zabbix server: $C_DEF \n"
+	read z_s_db_name
+	echo -en "$C_GREEN Please, enter username for base ${z_s_db_name}: $C_DEF \n"
+	read z_s_username
+	echo -en "$C_GREEN Please, enter password for user ${z_s_username}: $C_DEF \n"
+	read z_s_passwd
+	mysql -e "create database ${z_s_db_name} character set utf8 collate utf8_bin;"
+	mysql -e "grant all privileges on ${z_s_db_name}.* to ${z_s_username}@localhost identified by '${z_s_passwd}';"
+	zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -u${z_s_username} -p${z_s_passwd} ${z_s_db_name}
+
+	echo -en "$C_BLUE \n"
+	echo "Zabbix-server:"
+	echo "DB name: ${z_s_db_name}"
+	echo "DB username: ${z_s_username}"
+	echo "DB name: ${z_s_passwd}"
+	echo -en "$C_DEF \n"
+
+	zabbix_conf=/etc/zabbix/zabbix_server.conf
+	if [ "$OS" = "CentOS7" ]; then
+		httpd_conf=/etc/httpd/conf.d/zabbix.conf
+	else
+		httpd_conf=/etc/apache2/conf-available/zabbix.conf
+	fi
+
+	sed -i "/DBName=zabbix/c DBName=${z_s_db_name}" $zabbix_conf
+	sed -i "/DBUser=zabbix/c DBUser=${z_s_username}" $zabbix_conf
+	sed -i "/AlertScriptsPath=\/usr\/lib\/zabbix\/alertscripts/c AlertScriptsPath=\/etc\/zabbix\/alertscripts" $zabbix_conf
+	sed -i "/ExternalScripts=\/usr\/lib\/zabbix\/externalscripts/c ExternalScripts=\/etc\/zabbix\/externalscripts" $zabbix_conf
+	sed -i "/# DBPassword=/c DBPassword=${z_s_passwd}" $zabbix_conf
+
+	timezone=$(timedatectl | grep "Time zone" | awk '{print $3}')
+	sed -i "/# php_value date.timezone Europe\/Riga/c php_value date.timezone $timezone " $httpd_conf >> $httpd_conf
+	
+	systemctl start zabbix-server
+	systemctl enable zabbix-server
+
+	if [ "$OS" = "CentOS7" ]; then
+		setenforce Permissive
+        	systemctl stop firewalld
+	        systemctl disable firewalld
+		systemctl start httpd
+	        systemctl enable httpd
+	else
+		systemctl restart apache2
+                systemctl enable apache2
+	fi
+
+	host_ip=$(hostname -I | sed s/' '//)
+	echo ""
+	echo -en "$C_RED Warning!!! firewalld disabled!!! SELINUX in Permissive mode!!! $C_DEF \n"
+	echo -en "$C_BLUE Continue to setup zabbix-server 3.4 accessing the web http://${host_ip}/zabbix $C_DEF \n"
+	echo ""	
+}
+
+### Zabbix-server process ###
 		AreYouSure
 		if [ "$OS" = "CentOS7" ]; then
 			rpm -ivh http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-1.el7.centos.noarch.rpm
@@ -437,12 +437,16 @@ systemctl status docker.service
                         echo ""
                 fi
 	;;
-################################### 9.01 ???????????????? ##################################
+################################### 9.02 Proxmox VE installation ##################################
 	7)
 		AreYouSure
-                echo ""
-                echo "Sorry, but it doesn't ready!"
-                echo "" 
+		if [ "$OS" = "Debian9" ]; then
+              		echo "Sorry, it doesn't ready :("	  
+		else
+			echo ""
+        	        echo "Sorry, but it doesn't ready!"
+			echo "" 
+		fi
 esac
 
 exit 0
