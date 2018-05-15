@@ -91,10 +91,10 @@ if [ -f /etc/redhat-release ]; then
 		exit 1
 	fi
 elif [ -f /etc/debian_version ]; then
-	OS_RELEASE=$(lsb_release -c | awk '{print $2}')
-	if [[ $(lsb_release -cs) == 'jessie' ]]; then
+	OS_RELEASE=$(cat /etc/debian_version | awk -F . '{print $1}')
+	if [[ $OS_RELEASE == '8' ]]; then
 		OS="Debian8"; echo -en "$C_BLUE ======= $OS $OS_RELEASE ======= $C_DEF \n"
-	elif [[ $(lsb_release -cs) == 'stretch'  ]]; then
+	elif [[ $OS_RELEASE == '9'  ]]; then
                 OS="Debian9"; echo -en "$C_BLUE ======= $OS $OS_RELEASE ======= $C_DEF \n"
 	else
 		echo -en "$C_RED OS not supported! $C_DEF \n"
