@@ -3,6 +3,9 @@ Bash script to install some packages
 
 Works only on Debian 8, 9 and CentOS 7
 
+Version 10.02
+- added MariaDB 10.3 installation from official MariaDB repository
+
 Version 9.02
 - added Proxmox VE installation (Need check in real environment!!!)
 
