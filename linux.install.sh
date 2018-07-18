@@ -468,8 +468,9 @@ name = MariaDB
 baseurl = http://yum.mariadb.org/10.3/centos7-amd64
 gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
 gpgcheck=1
-EOF	
+EOF
 			yum install -y MariaDB-server MariaDB-client
+			systemctl start mysql
                         logfile
 
                 elif [ "$OS_RELEASE" = "jessie" ]; then
@@ -477,7 +478,7 @@ cat >  /etc/apt/sources.list.d/MariaDB.list <<EOF
 # http://downloads.mariadb.org/mariadb/repositories/
 deb [arch=amd64,i386] http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian jessie main
 deb-src http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian jessie main
-EOF     
+EOF
                         apt-get update
 			apt-get install mariadb-server -y
                         logfile
@@ -487,7 +488,7 @@ cat >  /etc/apt/sources.list.d/MariaDB.list <<EOF
 # http://downloads.mariadb.org/mariadb/repositories/
 deb [arch=amd64,i386,ppc64el] http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian stretch main
 deb-src http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian stretch main
-EOF     
+EOF
                         apt-get update
                         apt-get install mariadb-server -y
                         logfile
