@@ -514,8 +514,6 @@ EOF
                         echo "Sorry, OS unknown"
                 fi
 
-        ;;
-
 	
 esac
 
