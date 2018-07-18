@@ -479,9 +479,10 @@ cat >  /etc/apt/sources.list.d/MariaDB.list <<EOF
 deb [arch=amd64,i386] http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian jessie main
 deb-src http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian jessie main
 EOF
+			apt-get install apt-transport-https ca-certificates -y --force-yes
                         apt-get update
-			apt-get install mariadb-server -y
-                        logfile
+                        apt-get install mariadb-server -y --force-yes                        
+			logfile
 
                 elif [ "$OS_RELEASE" = "stretch" ]; then
 cat >  /etc/apt/sources.list.d/MariaDB.list <<EOF
@@ -489,8 +490,9 @@ cat >  /etc/apt/sources.list.d/MariaDB.list <<EOF
 deb [arch=amd64,i386,ppc64el] http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian stretch main
 deb-src http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian stretch main
 EOF
+			apt-get install apt-transport-https ca-certificates -y --force-yes
                         apt-get update
-                        apt-get install mariadb-server -y
+                        apt-get install mariadb-server -y --force-yes
                         logfile
 		else
                         echo "Sorry, OS unknown"
