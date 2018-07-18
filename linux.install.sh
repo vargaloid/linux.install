@@ -116,6 +116,7 @@ echo "|4. fail2ban-ssh                       |"
 echo "|5. zabbix-server 3.4                  |"
 echo "|6. Docker                             |"
 echo "|7. Proxmox VE (Only for Debian 9!)    |"
+echo "|8. MariaDB 10.3                       |"
 echo "----------------------------------------"
 
 read MENU
@@ -455,6 +456,68 @@ systemctl status docker.service
         	        echo "Sorry, but it doesn't ready!"
 			echo "" 
 		fi
+	;;
+################################### 10.02 MariaDB 10.3 install #####################################
+	8)
+		AreYouSure
+                if [ "$OS" = "CentOS7" ]; then
+cat >  /etc/yum.repos.d/MariaDB.repo <<EOF
+# http://downloads.mariadb.org/mariadb/repositories/
+[mariadb]
+name = MariaDB
+baseurl = http://yum.mariadb.org/10.3/centos7-amd64
+gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgcheck=1
+EOF
+			yum install -y MariaDB-server MariaDB-client
+			systemctl start mysql
+                        logfile
+
+                elif [ "$OS_RELEASE" = "jessie" ]; then
+cat >  /etc/apt/sources.list.d/MariaDB.list <<EOF
+# http://downloads.mariadb.org/mariadb/repositories/
+deb [arch=amd64,i386] http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian jessie main
+deb-src http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian jessie main
+EOF
+			apt-get install apt-transport-https ca-certificates -y --force-yes
+                        apt-get update
+                        apt-get install mariadb-server -y --force-yes                        
+			logfile
+
+                elif [ "$OS_RELEASE" = "stretch" ]; then
+cat >  /etc/apt/sources.list.d/MariaDB.list <<EOF
+# http://downloads.mariadb.org/mariadb/repositories/
+deb [arch=amd64,i386,ppc64el] http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian stretch main
+deb-src http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian stretch main
+EOF
+			apt-get install apt-transport-https ca-certificates -y --force-yes
+                        apt-get update
+                        apt-get install mariadb-server -y --force-yes
+                        logfile
+		else
+                        echo "Sorry, OS unknown"
+                fi
+
+        ;;
+################################## 11.02 Something #################################################		
+	9)
+                AreYouSure
+                if [ "$OS" = "CentOS7" ]; then
+
+                        logfile
+
+                elif [ "$OS_RELEASE" = "jessie" ]; then
+
+                        logfile
+
+                elif [ "$OS_RELEASE" = "stretch" ]; then
+
+                        logfile
+                else
+                        echo "Sorry, OS unknown"
+                fi
+
+	
 esac
 
 exit 0
