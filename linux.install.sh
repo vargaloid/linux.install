@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-###############################
-# Installer by Varg. ver 8.02 #
-###############################
+################################
+# Installer by Varg. ver 10.03 #
+################################
 
 C_BLUE='\033[36m'
 C_RED='\033[31m'
@@ -264,7 +264,7 @@ findtime = 3600
 # Max try to login
 maxretry = 5
 
-[ssh-iptables]
+[sshd]
 enabled = true
 filter = sshd
 action = iptables[name=ssh, port=ssh, protocol=tcp]
