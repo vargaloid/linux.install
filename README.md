@@ -3,6 +3,10 @@ Bash script to install some packages
 
 Works only on Debian 8, 9 and CentOS 7
 
+Version 11.00
+- GitLab installation added
+- Changed "Check OS TYPE & VERSION"
+
 Version 10.03
 - changed jail.local for fail2ban CentOS7 installation
 

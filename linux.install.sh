@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ################################
-# Installer by Varg. ver 10.03 #
+# Installer by Varg. ver 11.00 #
 ################################
 
 C_BLUE='\033[36m'
@@ -9,6 +9,7 @@ C_RED='\033[31m'
 C_GREEN='\033[32m'
 C_DEF='\033[0m'
 C_BOLD='\033[1m'
+C_YEL='\e[33m'
 
 ############################ 0.00 Log file #####################################
 exec 2>lin.inst.errors.log
@@ -38,13 +39,13 @@ AreYouSure () {
 echo -n "Do you really want to select this? (N/y): "
 read -n 1 AMSure
 case "$AMSure" in
-    y|Y) echo "" 
+    y|Y) echo ""
 	 echo "Ok! Let's do it!..."
 	 echo ""
         ;;
     *)   echo ""
 	 echo "Bye! :)"
-	 echo "" 
+	 echo ""
         exit 0
         ;;
 esac
@@ -67,7 +68,7 @@ create_my.cnf () {
 	echo "password = $MDB_PASS" >> /root/.my.cnf
 }
 
-################################### 1.01 Check root ##############################
+################################### 1.01 Check root ############################
 if [ "$(id -u)" != "0" ];  then
   echo ""
   echo -en "$C_BLUE ===== Hello $(whoami)! You need to be root to run this script! ===== $C_DEF \n"
@@ -80,7 +81,7 @@ else
   echo ""
 fi
 
-################################### 2.01 Check OS TYPE & VERSION #################
+################################### 2.01 Check OS TYPE & VERSION ###############
 if [ -f /etc/redhat-release ]; then
 	OS_RELEASE=$(cat /etc/redhat-release | awk '{print $1}')
 	OS_VERSION=$(cat /etc/os-release | grep VERSION_ID | awk -F '\"' '{print $2}')
@@ -93,19 +94,19 @@ if [ -f /etc/redhat-release ]; then
 elif [ -f /etc/debian_version ]; then
 	OS_RELEASE=$(cat /etc/debian_version | awk -F . '{print $1}')
 	if [[ $OS_RELEASE == '8' ]]; then
-		OS="Debian8"; echo -en "$C_BLUE ======= $OS $OS_RELEASE ======= $C_DEF \n"
+		OS="jessie"; echo -en "$C_BLUE ======= $OS $OS_RELEASE ======= $C_DEF \n"
 	elif [[ $OS_RELEASE == '9'  ]]; then
-                OS="Debian9"; echo -en "$C_BLUE ======= $OS $OS_RELEASE ======= $C_DEF \n"
+  	OS="stretch"; echo -en "$C_BLUE ======= $OS $OS_RELEASE ======= $C_DEF \n"
 	else
 		echo -en "$C_RED OS not supported! $C_DEF \n"
-                exit 1
+    exit 1
 	fi
 else
 	echo -en "$C_RED OS Unknown $C_DEF \n"
 	exit 1
 fi
 
-################################### 3.01 Main Menu##################################
+################################### 3.01 Main Menu##############################
 echo "----------------------------------------"
 echo "|    What do you want to install?      |"
 echo "----------------------------------------"
@@ -117,6 +118,7 @@ echo "|5. zabbix-server 3.4                  |"
 echo "|6. Docker                             |"
 echo "|7. Proxmox VE (Only for Debian 9!)    |"
 echo "|8. MariaDB 10.3                       |"
+echo "|9. GitLab CE (Only for Debian 9!)     |"
 echo "----------------------------------------"
 
 read MENU
@@ -127,7 +129,7 @@ case $MENU in
 		echo -en "$C_BLUE Bye! $C_DEF \n"
 		echo ""
 	;;
-################################### 4.01 Utils installation #########################
+################################### 4.01 Utils installation ####################
 	2)
 		AreYouSure
 		if [ "$OS" = "CentOS7" ]; then
@@ -139,7 +141,7 @@ case $MENU in
 			logfile
 		fi
 	;;
-################################### 5.01 vsftpd installation ########################
+################################### 5.01 vsftpd installation ###################
 	3)
 ### Vsftpd installation function ###
 config_vsftpd() {
@@ -192,14 +194,14 @@ read NEWFTPUSER
 case $NEWFTPUSER in
 yes | y)
 	echo ""
-	echo -en "$C_GREEN Please enter username $C_DEF \n" 
+	echo -en "$C_GREEN Please enter username $C_DEF \n"
 	echo ""
 	read FTPUSER
 	echo ""
-        echo -en "$C_GREEN Please enter home directory for user $FTPUSER (example:/home/$FTPUSER) $C_DEF \n" 
+        echo -en "$C_GREEN Please enter home directory for user $FTPUSER (example:/home/$FTPUSER) $C_DEF \n"
         echo ""
         read FTPHOME
-	
+
 	useradd -s /bin/false -d $FTPHOME -m $FTPUSER
 	echo "$FTPUSER" > $OSVSFTPD/vsftpd.userlist
 	echo "/bin/false" >> /etc/shells
@@ -214,13 +216,13 @@ systemctl enable vsftpd
 echo ""
 echo -en "$C_BLUE vsftpd was successfully installed $C_DEF \n"
 echo ""
-if [[ "$NEWFTPUSER" = "yes" || "$NEWFTPUSER" = "y" ]]; then 
+if [[ "$NEWFTPUSER" = "yes" || "$NEWFTPUSER" = "y" ]]; then
 	echo -en "$C_BLUE User $FTPUSER was successfully added $C_DEF \n"
 	echo ""
 else
 	echo ""
 fi
-echo -en "$C_RED Please don't forget add firewall rules for ftp! Have a nice day! $C_DEF \n" 
+echo -en "$C_RED Please don't forget add firewall rules for ftp! Have a nice day! $C_DEF \n"
 echo ""
 netstat -tulpn | grep ftp
 echo ""
@@ -243,8 +245,8 @@ CENTOSVSFTPD=/etc/vsftpd
 			logfile
                 fi
         ;;
-################################### 6.01 fail2ban-ssh ###############################
-4)
+################################### 6.01 fail2ban-ssh ##########################
+  4)
 
 		AreYouSure
 if [ "$OS" = "CentOS7" ]; then
@@ -253,10 +255,10 @@ yum install -y fail2ban
 	cat > /etc/fail2ban/jail.local <<EOF
 [DEFAULT]
 # Ban hosts for 24 hours
-bantime = 86400 
+bantime = 86400
 
 # List white addresses
-ignoreip = 127.0.0.1/8 
+ignoreip = 127.0.0.1/8
 
 # Time interval when fail2ban find activity (in seconds)
 findtime = 3600
@@ -285,10 +287,10 @@ apt-get install -y fail2ban
         cat > /etc/fail2ban/jail.local <<EOF
 [DEFAULT]
 # Ban hosts for 24 hours
-bantime = 86400 
+bantime = 86400
 
 # List white addresses
-ignoreip = 127.0.0.1/8 
+ignoreip = 127.0.0.1/8
 
 # Time interval when fail2ban find activity (in seconds)
 findtime = 3600
@@ -313,7 +315,7 @@ EOF
 	logfile
 fi
 ;;
-################################### 7.01 zabbix-server 3.4 ##################################
+################################### 7.01 zabbix-server 3.4 #####################
 	5)
 ### Zabbix-server setup function ###
 config_zabbix_server () {
@@ -350,7 +352,7 @@ config_zabbix_server () {
 
 	timezone=$(timedatectl | grep "Time zone" | awk '{print $3}')
 	sed -i "/# php_value date.timezone Europe\/Riga/c php_value date.timezone $timezone " $httpd_conf >> $httpd_conf
-	
+
 	systemctl start zabbix-server
 	systemctl enable zabbix-server
 
@@ -369,21 +371,21 @@ config_zabbix_server () {
 	echo ""
 	echo -en "$C_RED Warning!!! firewalld disabled!!! SELINUX in Permissive mode!!! $C_DEF \n"
 	echo -en "$C_BLUE Continue to setup zabbix-server 3.4 accessing the web http://${host_ip}/zabbix $C_DEF \n"
-	echo ""	
+	echo ""
 }
 
 ### Zabbix-server process ###
 		AreYouSure
 		if [ "$OS" = "CentOS7" ]; then
 			rpm -ivh http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-1.el7.centos.noarch.rpm
-                        yum install -y zabbix-server-mysql zabbix-web-mysql mariadb-server	
+                        yum install -y zabbix-server-mysql zabbix-web-mysql mariadb-server
 			systemctl start mariadb
 		        systemctl enable mariadb
 
 			config_zabbix_server
 			logfile
 
-		elif [ "$OS_RELEASE" = "jessie" ]; then
+		elif [ "$OS" = "jessie" ]; then
 			wget http://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+jessie_all.deb
 			dpkg -i zabbix-release_3.4-1+jessie_all.deb
 			apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-server
@@ -393,12 +395,12 @@ config_zabbix_server () {
                         config_zabbix_server
 			logfile
 
-		elif [ "$OS_RELEASE" = "stretch" ]; then
+		elif [ "$OS" = "stretch" ]; then
                 	wget http://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+stretch_all.deb
                         dpkg -i zabbix-release_3.4-1+stretch_all.deb
                         apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-server
 			systemctl enable mariadb
-	
+
 			config_zabbix_server
 			logfile
 
@@ -407,11 +409,11 @@ config_zabbix_server () {
                 fi
 
 	;;
-################################### 8.02 Docker #####################################
+################################### 8.02 Docker ################################
 	6)
 ### Docker function ###
 DockerStart () {
-systemctl start docker.service 
+systemctl start docker.service
 systemctl enable docker.service
 systemctl status docker.service
 }
@@ -423,7 +425,7 @@ systemctl status docker.service
 			yum install -y docker-ce
 			DockerStart
 			logfile
-		elif [[ $OS == "Debian8" || $OS == "Debian9" ]]; then
+		elif [[ $OS == "jessie" || $OS == "stretch" ]]; then
 			apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common
 			curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
 			apt-key fingerprint 0EBFCD88
@@ -438,10 +440,10 @@ systemctl status docker.service
                         echo ""
                 fi
 	;;
-################################### 9.02 Proxmox VE installation ##################################
+################################### 9.02 Proxmox VE installation ###############
 	7)
 		AreYouSure
-		if [ "$OS" = "Debian9" ]; then
+		if [ "$OS" = "stretch" ]; then
 			echo "$(hostname -I) $(hostname) pvelocalhost" >> /etc/hosts
 			echo "deb http://download.proxmox.com/debian/pve stretch pve-no-subscription" > /etc/apt/sources.list.d/pve-install-repo.list
 			wget http://download.proxmox.com/debian/proxmox-ve-release-5.x.gpg -O /etc/apt/trusted.gpg.d/proxmox-ve-release-5.x.gpg
@@ -449,15 +451,15 @@ systemctl status docker.service
 			apt-get remove -y os-prober
 			echo ""
 			echo -en "$C_BLUE Please, reboot your system and check your kernel $C_DEF \n"
-              		echo ""	  
+      echo ""
 			logfile
 		else
 			echo ""
-        	        echo "Sorry, but it doesn't ready!"
-			echo "" 
+      echo "Sorry, but it doesn't ready!"
+			echo ""
 		fi
 	;;
-################################### 10.02 MariaDB 10.3 install #####################################
+################################### 10.02 MariaDB 10.3 install #################
 	8)
 		AreYouSure
                 if [ "$OS" = "CentOS7" ]; then
@@ -473,7 +475,7 @@ EOF
 			systemctl start mysql
                         logfile
 
-                elif [ "$OS_RELEASE" = "jessie" ]; then
+                elif [ "$OS" = "jessie" ]; then
 cat >  /etc/apt/sources.list.d/MariaDB.list <<EOF
 # http://downloads.mariadb.org/mariadb/repositories/
 deb [arch=amd64,i386] http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian jessie main
@@ -481,10 +483,10 @@ deb-src http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian jessie main
 EOF
 			apt-get install apt-transport-https ca-certificates -y --force-yes
                         apt-get update
-                        apt-get install mariadb-server -y --force-yes                        
+                        apt-get install mariadb-server -y --force-yes
 			logfile
 
-                elif [ "$OS_RELEASE" = "stretch" ]; then
+                elif [ "$OS" = "stretch" ]; then
 cat >  /etc/apt/sources.list.d/MariaDB.list <<EOF
 # http://downloads.mariadb.org/mariadb/repositories/
 deb [arch=amd64,i386,ppc64el] http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian stretch main
@@ -499,25 +501,37 @@ EOF
                 fi
 
         ;;
-################################## 11.02 Something #################################################		
+################################### 11.00 GitHub CE installation ###############
 	9)
-                AreYouSure
-                if [ "$OS" = "CentOS7" ]; then
+			AreYouSure
+      if [ "$OS" = "CentOS7" ]; then
+				echo -e "$C_RED Sorry, CentOS 7 is not supported $C_DEF"
+        logfile
 
-                        logfile
+      elif [ "$OS" = "jessie" ]; then
+				echo -e "$C_RED Sorry, Debian 8 is not supported $C_DEF"
+        logfile
 
-                elif [ "$OS_RELEASE" = "jessie" ]; then
+      elif [ "$OS" = "stretch" ]; then
+				dpkg-reconfigure locales
+				apt-get update
+				apt-get install -y openssh-server ca-certificates postfix curl
+				curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | bash
+				echo ""
+				echo -e "$C_GREEN Please, enter external_url for GitLab project. Example:$C_DEF $C_YEL http://gitlab.example.com $C_DEF"
+				echo ""
+				read Ext_Url
+				EXTERNAL_URL="http://${Ext_Url}" apt-get install gitlab-ce
+				echo ""
+				echo -e "$C_GREEN Please, visit http://${Ext_Url} to finish installation $C_DEF"
+				echo ""
+        logfile
 
-                        logfile
+      else
+        echo -e "$C_RED Sorry, OS unknown $C_DEF"
+				logfile
+      fi
 
-                elif [ "$OS_RELEASE" = "stretch" ]; then
-
-                        logfile
-                else
-                        echo "Sorry, OS unknown"
-                fi
-
-	
 esac
 
 exit 0
