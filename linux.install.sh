@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ################################
-# Installer by Varg. ver 11.00 #
+# Installer by Varg. ver 11.01 #
 ################################
 
 C_BLUE='\033[36m'
@@ -205,6 +205,9 @@ yes | y)
 	useradd -s /bin/false -d $FTPHOME -m $FTPUSER
 	echo "$FTPUSER" > $OSVSFTPD/vsftpd.userlist
 	echo "/bin/false" >> /etc/shells
+	echo ""
+	echo -en "$C_GREEN Please enter password for user $FTPUSER twice $C_DEF \n"
+	echo ""
 	passwd $FTPUSER
 ;;
 *)
@@ -224,7 +227,7 @@ else
 fi
 echo -en "$C_RED Please don't forget add firewall rules for ftp! Have a nice day! $C_DEF \n"
 echo ""
-netstat -tulpn | grep ftp
+ss -tulpn | grep ftp
 echo ""
 
 }
