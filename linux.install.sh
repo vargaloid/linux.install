@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ################################
-# Installer by Varg. ver 11.01 #
+# Installer by Varg. ver 11.02 #
 ################################
 
 C_BLUE='\033[36m'
@@ -205,9 +205,6 @@ yes | y)
 	useradd -s /bin/false -d $FTPHOME -m $FTPUSER
 	echo "$FTPUSER" > $OSVSFTPD/vsftpd.userlist
 	echo "/bin/false" >> /etc/shells
-	echo ""
-	echo -en "$C_GREEN Please enter password for user $FTPUSER twice $C_DEF \n"
-	echo ""
 	passwd $FTPUSER
 ;;
 *)
@@ -227,7 +224,7 @@ else
 fi
 echo -en "$C_RED Please don't forget add firewall rules for ftp! Have a nice day! $C_DEF \n"
 echo ""
-ss -tulpn | grep ftp
+netstat -tulpn | grep ftp
 echo ""
 
 }
@@ -430,7 +427,7 @@ systemctl status docker.service
 			logfile
 		elif [[ $OS == "jessie" || $OS == "stretch" ]]; then
 			apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common
-			curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+			curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
 			apt-key fingerprint 0EBFCD88
 			add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
 			apt-get update
@@ -518,7 +515,7 @@ EOF
       elif [ "$OS" = "stretch" ]; then
 				dpkg-reconfigure locales
 				apt-get update
-				apt-get install -y openssh-server ca-certificates postfix curl
+				apt-get install -y sudo openssh-server ca-certificates postfix curl
 				curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | bash
 				echo ""
 				echo -e "$C_GREEN Please, enter external_url for GitLab project. Example:$C_DEF $C_YEL http://gitlab.example.com $C_DEF"

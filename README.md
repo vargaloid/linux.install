@@ -3,6 +3,9 @@ Bash script to install some packages
 
 Works only on Debian 8, 9 and CentOS 7
 
+Version 11.02
+- docker installation bug fix
+
 Version 11.01
 - vsftpd installation bug fix
 
