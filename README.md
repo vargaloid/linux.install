@@ -1,7 +1,19 @@
 # varg.install
 Bash script to install some packages
 
-Works only on Debian 8, 9 and CentOS 7
+Installation Features:
+- mc,vim,sudo,wget,git
+- vsftpd
+- fail2ban-ssh
+- zabbix-server 3.4 
+- Docker Engine (CE)
+- Proxmox VE 5
+- MariaDB 10.3
+- GitLab (CE)
+- jenkins (in developing)
+
+Version 13.00
+- added gitlab installation for Debian 10 (Buster) and CentOS7
 
 Version 12.00
 - added docker compose-installation
