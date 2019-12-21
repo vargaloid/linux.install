@@ -118,7 +118,7 @@ echo "|5. zabbix-server 3.4                  |"
 echo "|6. Docker                             |"
 echo "|7. Proxmox VE (Only for Debian 9!)    |"
 echo "|8. MariaDB 10.3                       |"
-echo "|9. GitLab CE (Only for Debian 9!)     |"
+echo "|9. GitLab CE                          |"
 echo "----------------------------------------"
 
 read MENU
@@ -527,7 +527,7 @@ if [ "$OS" = "CentOS7" ]; then
         echo -e "$C_GREEN Please, enter external_url for GitLab project. Example:$C_DEF $C_YEL http://gitlab.example.com $C_DEF"
         echo ""
         read Ext_Url
-        EXTERNAL_URL="${Ext_Url}" yum install -y gitlab-ee 
+        EXTERNAL_URL="${Ext_Url}" yum install -y gitlab-ce 
         echo ""
         echo -e "$C_GREEN Please, visit ${Ext_Url} to finish installation $C_DEF"
         echo ""
