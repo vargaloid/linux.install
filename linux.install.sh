@@ -508,37 +508,51 @@ EOF
                 fi
 
         ;;
-################################### 11.00 GitHub CE installation ###############
-	9)
-			AreYouSure
-      if [ "$OS" = "CentOS7" ]; then
-				echo -e "$C_RED Sorry, CentOS 7 is not supported $C_DEF"
-        logfile
+################################### 11.00 GitLab CE installation ###############
+9)
+AreYouSure
+if [ "$OS" = "CentOS7" ]; then
+	yum install -y curl policycoreutils-python openssh-server
+	systemctl enable sshd
+	systemctl start sshd
+	firewall-cmd --permanent --add-service=http
+	firewall-cmd --permanent --add-service=https
+	systemctl reload firewalld
+	yum install postfix
+	systemctl enable postfix
+	systemctl start postfix
 
-      elif [ "$OS" = "jessie" ]; then
-				echo -e "$C_RED Sorry, Debian 8 is not supported $C_DEF"
+	curl -s https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.rpm.sh | bash
+	echo ""
+        echo -e "$C_GREEN Please, enter external_url for GitLab project. Example:$C_DEF $C_YEL http://gitlab.example.com $C_DEF"
+        echo ""
+        read Ext_Url
+        EXTERNAL_URL="${Ext_Url}" yum install -y gitlab-ee 
+        echo ""
+        echo -e "$C_GREEN Please, visit ${Ext_Url} to finish installation $C_DEF"
+        echo ""
         logfile
-
-      elif [ "$OS" = "stretch" ]; then
-				dpkg-reconfigure locales
-				apt-get update
-				apt-get install -y sudo openssh-server ca-certificates postfix curl
-				curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | bash
-				echo ""
-				echo -e "$C_GREEN Please, enter external_url for GitLab project. Example:$C_DEF $C_YEL http://gitlab.example.com $C_DEF"
-				echo ""
-				read Ext_Url
-				EXTERNAL_URL="http://${Ext_Url}" apt-get install gitlab-ce
-				echo ""
-				echo -e "$C_GREEN Please, visit http://${Ext_Url} to finish installation $C_DEF"
-				echo ""
+elif [ "$OS" = "jessie" ]; then
+	echo -e "$C_RED Sorry, Debian 8 is not supported $C_DEF"
         logfile
-
-      else
+elif [ "$OS" = "stretch" || "$OS" = "buster" ]; then
+	dpkg-reconfigure locales
+	apt-get update
+	apt-get install -y sudo openssh-server ca-certificates postfix curl
+	curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | bash
+	echo ""
+	echo -e "$C_GREEN Please, enter external_url for GitLab project. Example:$C_DEF $C_YEL http://gitlab.example.com $C_DEF"
+	echo ""
+	read Ext_Url
+	EXTERNAL_URL="${Ext_Url}" apt-get install gitlab-ce
+	echo ""
+	echo -e "$C_GREEN Please, visit ${Ext_Url} to finish installation $C_DEF"
+	echo ""
+        logfile
+else
         echo -e "$C_RED Sorry, OS unknown $C_DEF"
-				logfile
-      fi
-
+	logfile
+fi
 esac
 
 exit 0
