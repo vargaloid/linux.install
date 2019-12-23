@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
 ################################
-# Installer by Varg. ver 12.00 #
+# Installer by Varg. ver 15.00 #
 ################################
+
+Version='15.00'
 
 C_BLUE='\033[36m'
 C_RED='\033[31m'
@@ -77,8 +79,7 @@ if [ "$(id -u)" != "0" ];  then
 else
   echo ""
   echo -en "$C_BLUE ====================== Hello $(whoami)! ====================== $C_DEF \n"
-  echo -en "$C_BLUE *** This script works only on CentOS 7; Debian 8, Debian 9 *** $C_DEF \n"
-  echo ""
+  echo -en "$C_BLUE *************** The script version is $Version *************** $C_DEF \n"
 fi
 
 ################################### 2.01 Check OS TYPE & VERSION ###############
@@ -94,9 +95,11 @@ if [ -f /etc/redhat-release ]; then
 elif [ -f /etc/debian_version ]; then
 	OS_RELEASE=$(cat /etc/debian_version | awk -F . '{print $1}')
 	if [[ $OS_RELEASE == '8' ]]; then
-		OS="jessie"; echo -en "$C_BLUE ======= $OS $OS_RELEASE ======= $C_DEF \n"
+		OS="jessie"; echo -en "$C_BLUE ==================== Debian $OS_RELEASE $OS ==================== $C_DEF \n"
 	elif [[ $OS_RELEASE == '9'  ]]; then
-  	OS="stretch"; echo -en "$C_BLUE ======= $OS $OS_RELEASE ======= $C_DEF \n"
+  		OS="stretch"; echo -en "$C_BLUE ==================== Debian $OS_RELEASE $OS ==================== $C_DEF \n"
+	elif [[ $OS_RELEASE == '10' ]]; then
+		OS="buster"; echo -en "$C_BLUE ==================== Debian $OS_RELEASE $OS ==================== $C_DEF \n"
 	else
 		echo -en "$C_RED OS not supported! $C_DEF \n"
     exit 1
@@ -107,8 +110,6 @@ else
 fi
 
 ################################### 3.01 Main Menu##############################
-echo " Version 14.00 " 
-echo ""
 echo "----------------------------------------"
 echo "|    What do you want to install?      |"
 echo "----------------------------------------"
@@ -116,9 +117,9 @@ echo "|1. exit                               |"
 echo "|2. mc,vim,sudo,wget,git               |"
 echo "|3. vsftpd                             |"
 echo "|4. fail2ban-ssh                       |"
-echo "|5. zabbix-server 3.4                  |"
+echo "|5. zabbix-server 4.0                  |"
 echo "|6. Docker                             |"
-echo "|7. Proxmox VE (Only for Debian 9!)    |"
+echo "|7. Proxmox VE5 (stretch), VE6 (buster)|"
 echo "|8. MariaDB 10.3                       |"
 echo "|9. GitLab CE                          |"
 echo "----------------------------------------"
@@ -317,8 +318,8 @@ EOF
 	logfile
 fi
 ;;
-################################### 7.01 zabbix-server 3.4 #####################
-	5)
+################################### 7.01 zabbix-server 4.0 #####################
+5)
 ### Zabbix-server setup function ###
 config_zabbix_server () {
 
@@ -330,13 +331,15 @@ config_zabbix_server () {
 	read z_s_passwd
 	mysql -e "create database ${z_s_db_name} character set utf8 collate utf8_bin;"
 	mysql -e "grant all privileges on ${z_s_db_name}.* to ${z_s_username}@localhost identified by '${z_s_passwd}';"
+	mysql -e "set global innodb_strict_mode='OFF';" ### Fix for version 4.0 and newiest MariaDB/MySQL
 	zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -u${z_s_username} -p${z_s_passwd} ${z_s_db_name}
+	mysql -e "set global innodb_strict_mode='ON';" ### Fix  for version 4.0 and newiest MariaDB/MySQL
 
 	echo -en "$C_BLUE \n"
 	echo "Zabbix-server:"
 	echo "DB name: ${z_s_db_name}"
 	echo "DB username: ${z_s_username}"
-	echo "DB name: ${z_s_passwd}"
+	echo "DB password: ${z_s_passwd}"
 	echo -en "$C_DEF \n"
 
 	zabbix_conf=/etc/zabbix/zabbix_server.conf
@@ -372,45 +375,54 @@ config_zabbix_server () {
 	host_ip=$(hostname -I | sed s/' '//)
 	echo ""
 	echo -en "$C_RED Warning!!! firewalld disabled!!! SELINUX in Permissive mode!!! $C_DEF \n"
-	echo -en "$C_BLUE Continue to setup zabbix-server 3.4 accessing the web http://${host_ip}/zabbix $C_DEF \n"
+	echo -en "$C_BLUE Continue to setup zabbix-server 4.0 accessing the web http://${host_ip}/zabbix $C_DEF \n"
 	echo ""
 }
 
 ### Zabbix-server process ###
-		AreYouSure
-		if [ "$OS" = "CentOS7" ]; then
-			rpm -ivh http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-1.el7.centos.noarch.rpm
-                        yum install -y zabbix-server-mysql zabbix-web-mysql mariadb-server
-			systemctl start mariadb
-		        systemctl enable mariadb
+AreYouSure
+if [ "$OS" = "CentOS7" ]; then
+	rpm -Uvh https://repo.zabbix.com/zabbix/4.0/rhel/7/x86_64/zabbix-release-4.0-2.el7.noarch.rpm
+        yum install -y zabbix-server-mysql zabbix-web-mysql mariadb-server zabbix-agent
+	systemctl start mariadb
+	systemctl enable mariadb
 
-			config_zabbix_server
-			logfile
+	config_zabbix_server
+	logfile
 
-		elif [ "$OS" = "jessie" ]; then
-			wget http://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+jessie_all.deb
-			dpkg -i zabbix-release_3.4-1+jessie_all.deb
-			apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-server
-			systemctl enable mysql
+elif [ "$OS" = "jessie" ]; then
+	wget https://repo.zabbix.com/zabbix/4.0/debian/pool/main/z/zabbix-release/zabbix-release_4.0-3+jessie_all.deb
+	dpkg -i zabbix-release_4.0-3+jessie_all.deb
+	apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-server zabbix-agent
+	systemctl enable mysql
 
-			create_my.cnf
-                        config_zabbix_server
-			logfile
+	create_my.cnf
+        config_zabbix_server
+	logfile
 
-		elif [ "$OS" = "stretch" ]; then
-                	wget http://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+stretch_all.deb
-                        dpkg -i zabbix-release_3.4-1+stretch_all.deb
-                        apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-server
-			systemctl enable mariadb
+elif [ "$OS" = "stretch" ]; then
+        wget https://repo.zabbix.com/zabbix/4.0/debian/pool/main/z/zabbix-release/zabbix-release_4.0-3+stretch_all.deb 
+        dpkg -i zabbix-release_4.0-3+stretch_all.deb 
+        apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-server zabbix-agent
+	systemctl enable mariadb
 
-			config_zabbix_server
-			logfile
+	config_zabbix_server
+	logfile
 
-		else
-                        echo "Sorry, OS unknown"
-                fi
+elif [ "$OS" = "buster" ]; then
+        wget https://repo.zabbix.com/zabbix/4.0/debian/pool/main/z/zabbix-release/zabbix-release_4.0-3+buster_all.deb 
+        dpkg -i zabbix-release_4.0-3+buster_all.deb 
+        apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-server zabbix-agent
+        systemctl enable mariadb
 
-	;;
+        config_zabbix_server
+        logfile
+
+else
+        echo "Sorry, OS unknown"
+fi
+
+;;
 ################################### 8.02 Docker ################################
 	6)
 ### Docker function ###

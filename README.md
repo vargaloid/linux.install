@@ -5,12 +5,15 @@ Installation Features:
 - mc,vim,sudo,wget,git
 - vsftpd
 - fail2ban-ssh
-- zabbix-server 3.4 
+- zabbix-server 4.0 
 - Docker Engine (CE)
 - Proxmox VE 5 (stretch), VE 6 (buster)
 - MariaDB 10.3
 - GitLab (CE)
 - jenkins (in developing)
+
+Version 15.00
+- version of zabbix-server chamged to 4.0
 
 Version 14.00
 - added Proxmox VE 6 to Debian 10 (Buster)
