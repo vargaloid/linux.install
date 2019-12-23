@@ -521,8 +521,7 @@ if [ "$OS" = "CentOS7" ]; then
 	yum install postfix
 	systemctl enable postfix
 	systemctl start postfix
-
-	curl -s https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.rpm.sh | bash
+	curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.rpm.sh | bash
 	echo ""
         echo -e "$C_GREEN Please, enter external_url for GitLab project. Example:$C_DEF $C_YEL http://gitlab.example.com $C_DEF"
         echo ""
