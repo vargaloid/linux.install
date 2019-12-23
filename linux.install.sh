@@ -107,6 +107,8 @@ else
 fi
 
 ################################### 3.01 Main Menu##############################
+echo " Version 14.00 " 
+echo ""
 echo "----------------------------------------"
 echo "|    What do you want to install?      |"
 echo "----------------------------------------"
@@ -448,24 +450,36 @@ DockerComposeInstall () {
                 fi
 	;;
 ################################### 9.02 Proxmox VE installation ###############
-	7)
-		AreYouSure
-		if [ "$OS" = "stretch" ]; then
-			echo "$(hostname -I) $(hostname) pvelocalhost" >> /etc/hosts
-			echo "deb http://download.proxmox.com/debian/pve stretch pve-no-subscription" > /etc/apt/sources.list.d/pve-install-repo.list
-			wget http://download.proxmox.com/debian/proxmox-ve-release-5.x.gpg -O /etc/apt/trusted.gpg.d/proxmox-ve-release-5.x.gpg
-			apt-get update && apt-get install -y proxmox-ve postfix open-iscsi
-			apt-get remove -y os-prober
-			echo ""
-			echo -en "$C_BLUE Please, reboot your system and check your kernel $C_DEF \n"
-      echo ""
-			logfile
-		else
-			echo ""
-      echo "Sorry, but it doesn't ready!"
-			echo ""
-		fi
-	;;
+7)
+AreYouSure
+if [ "$OS" = "stretch" ]; then
+	echo "$(hostname -I) $(hostname) pvelocalhost" >> /etc/hosts
+	echo "deb http://download.proxmox.com/debian/pve stretch pve-no-subscription" > /etc/apt/sources.list.d/pve-install-repo.list
+	wget http://download.proxmox.com/debian/proxmox-ve-release-5.x.gpg -O /etc/apt/trusted.gpg.d/proxmox-ve-release-5.x.gpg
+	apt-get update && apt-get install -y proxmox-ve postfix open-iscsi
+	apt-get remove -y os-prober
+	echo ""
+	echo -en "$C_BLUE Please, reboot your system and check your kernel $C_DEF \n"
+	echo ""
+	logfile
+elif [ "$OS" = "buster"]; then
+	echo "$(hostname -I) $(hostname) pvelocalhost" >> /etc/hosts
+        echo "deb http://download.proxmox.com/debian/pve buster pve-no-subscription" > /etc/apt/sources.list.d/pve-install-repo.list
+	wget http://download.proxmox.com/debian/proxmox-ve-release-6.x.gpg -O /etc/apt/trusted.gpg.d/proxmox-ve-release-6.x.gpg
+	chmod +r /etc/apt/trusted.gpg.d/proxmox-ve-release-6.x.gpg
+	apt update && apt full-upgrade -y
+        apt-get update && apt-get install -y proxmox-ve postfix open-iscsi
+        apt-get remove -y os-prober
+        echo ""
+        echo -en "$C_BLUE Please, reboot your system and check your kernel $C_DEF \n"
+        echo ""
+        logfile
+else
+	echo ""
+	echo "Sorry, but it doesn't ready!"
+	echo ""
+fi
+;;
 ################################### 10.02 MariaDB 10.3 install #################
 	8)
 		AreYouSure

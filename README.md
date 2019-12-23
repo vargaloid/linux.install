@@ -7,10 +7,13 @@ Installation Features:
 - fail2ban-ssh
 - zabbix-server 3.4 
 - Docker Engine (CE)
-- Proxmox VE 5
+- Proxmox VE 5 (stretch), VE 6 (buster)
 - MariaDB 10.3
 - GitLab (CE)
 - jenkins (in developing)
+
+Version 14.00
+- added Proxmox VE 6 to Debian 10 (Buster)
 
 Version 13.00
 - added gitlab installation for Debian 10 (Buster) and CentOS7
