@@ -10,7 +10,10 @@ Installation Features:
 - Proxmox VE 5 (stretch), VE 6 (buster)
 - MariaDB 10.3
 - GitLab (CE)
-- jenkins (in developing)
+- Jenkins
+
+Version 16.00
+- Jenkins install added
 
 Version 15.00
 - version of zabbix-server chamged to 4.0

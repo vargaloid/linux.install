@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 ################################
-# Installer by Varg. ver 15.00 #
+# Installer by Varg. ver 16.00 #
 ################################
 
-Version='15.00'
+Version='16.00'
 
 C_BLUE='\033[36m'
 C_RED='\033[31m'
@@ -122,6 +122,7 @@ echo "|6. Docker                             |"
 echo "|7. Proxmox VE5 (stretch), VE6 (buster)|"
 echo "|8. MariaDB 10.3                       |"
 echo "|9. GitLab CE                          |"
+echo "|10. Jenkins                           |"
 echo "----------------------------------------"
 
 read MENU
@@ -578,6 +579,45 @@ else
         echo -e "$C_RED Sorry, OS unknown $C_DEF"
 	logfile
 fi
+;;
+###################################### 15.00 jenkins #############################
+10)
+AreYouSure
+if [ "$OS" = "CentOS7" ]; then
+	yum install -y wget java
+	wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo
+	rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key
+	yum install -y jenkins
+	firewall-cmd --permanent --zone=public --add-port=8080/tcp
+	firewall-cmd --reload
+	service jenkins start
+	chkconfig jenkins on
+	host_ip=$(hostname -I | sed s/' '//)
+        echo ""
+        echo -en "$C_BLUE Continue to setup jenkins accessing the web http://${host_ip}:8080 $C_DEF \n"
+        echo ""
+
+        logfile
+elif [[ "$OS" = "stretch" || "$OS" = "buster" ]]; then
+	dpkg-reconfigure locales
+	apt-get update && apt-get install -y apt-transport-https default-jre gnupg2
+	wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | apt-key add -
+	sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+	apt-get update && apt-get install -y jenkins
+	host_ip=$(hostname -I | sed s/' '//)
+        echo ""
+	echo -en "$C_BLUE Continue to setup jenkins accessing the web http://${host_ip}:8080 $C_DEF \n"
+        echo ""
+
+
+	logfile
+else
+	echo -e "$C_RED Sorry, OS not supported $C_DEF"
+	logfile
+fi
+
+
+
 esac
 
 exit 0
