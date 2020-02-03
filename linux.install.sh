@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-################################
-# Installer by Varg. ver 16.00 #
-################################
+########################################################
+# Installer by https://github.com/vargaloid Ver.11.0.0 #
+########################################################
 
-Version='16.00'
+Version='11.0.0'
 
 C_BLUE='\033[36m'
 C_RED='\033[31m'
@@ -13,8 +13,8 @@ C_DEF='\033[0m'
 C_BOLD='\033[1m'
 C_YEL='\e[33m'
 
-############################ 0.00 Log file #####################################
-exec 2>lin.inst.errors.log
+############################ Log file #####################################
+#exec 2>lin.inst.errors.log
 
 ############################ FUNCTIONS #########################################
 ### Log Func ###
@@ -70,7 +70,7 @@ create_my.cnf () {
 	echo "password = $MDB_PASS" >> /root/.my.cnf
 }
 
-################################### 1.01 Check root ############################
+################################### Check root ############################
 if [ "$(id -u)" != "0" ];  then
   echo ""
   echo -en "$C_BLUE ===== Hello $(whoami)! You need to be root to run this script! ===== $C_DEF \n"
@@ -82,7 +82,7 @@ else
   echo -en "$C_BLUE *************** The script version is $Version *************** $C_DEF \n"
 fi
 
-################################### 2.01 Check OS TYPE & VERSION ###############
+################################### Check OS TYPE & VERSION ###############
 if [ -f /etc/redhat-release ]; then
 	OS_RELEASE=$(cat /etc/redhat-release | awk '{print $1}')
 	OS_VERSION=$(cat /etc/os-release | grep VERSION_ID | awk -F '\"' '{print $2}')
@@ -94,12 +94,15 @@ if [ -f /etc/redhat-release ]; then
 	fi
 elif [ -f /etc/debian_version ]; then
 	OS_RELEASE=$(cat /etc/debian_version | awk -F . '{print $1}')
+	Lsb_Release=$(lsb_release -c  | awk '{print $2}')
 	if [[ $OS_RELEASE == '8' ]]; then
 		OS="jessie"; echo -en "$C_BLUE ==================== Debian $OS_RELEASE $OS ==================== $C_DEF \n"
 	elif [[ $OS_RELEASE == '9'  ]]; then
   		OS="stretch"; echo -en "$C_BLUE ==================== Debian $OS_RELEASE $OS ==================== $C_DEF \n"
 	elif [[ $OS_RELEASE == '10' ]]; then
 		OS="buster"; echo -en "$C_BLUE ==================== Debian $OS_RELEASE $OS ==================== $C_DEF \n"
+	elif [[ $Lsb_Release == 'bionic' ]]; then
+                OS="bionic"; echo -en "$C_BLUE ================= Ubuntu 18.04 $OS ================= $C_DEF \n"
 	else
 		echo -en "$C_RED OS not supported! $C_DEF \n"
     exit 1
@@ -109,11 +112,11 @@ else
 	exit 1
 fi
 
-################################### 3.01 Main Menu##############################
+################################### 1. Main Menu##############################
 echo "----------------------------------------"
 echo "|    What do you want to install?      |"
 echo "----------------------------------------"
-echo "|1. exit                               |"
+echo "|1. quit                               |"
 echo "|2. mc,vim,sudo,wget,git               |"
 echo "|3. vsftpd                             |"
 echo "|4. fail2ban-ssh                       |"
@@ -123,6 +126,7 @@ echo "|7. Proxmox VE5 (stretch), VE6 (buster)|"
 echo "|8. MariaDB 10.3                       |"
 echo "|9. GitLab CE                          |"
 echo "|10. Jenkins                           |"
+echo "|11. Prometheus with Grafana           |"
 echo "----------------------------------------"
 
 read MENU
@@ -133,7 +137,7 @@ case $MENU in
 		echo -en "$C_BLUE Bye! $C_DEF \n"
 		echo ""
 	;;
-################################### 4.01 Utils installation ####################
+################################### 2. Utils installation ####################
 	2)
 		AreYouSure
 		if [ "$OS" = "CentOS7" ]; then
@@ -145,7 +149,7 @@ case $MENU in
 			logfile
 		fi
 	;;
-################################### 5.01 vsftpd installation ###################
+################################### 3. vsftpd installation ###################
 	3)
 ### Vsftpd installation function ###
 config_vsftpd() {
@@ -249,7 +253,7 @@ CENTOSVSFTPD=/etc/vsftpd
 			logfile
                 fi
         ;;
-################################### 6.01 fail2ban-ssh ##########################
+################################### 4. fail2ban-ssh ##########################
   4)
 
 		AreYouSure
@@ -319,7 +323,7 @@ EOF
 	logfile
 fi
 ;;
-################################### 7.01 zabbix-server 4.0 #####################
+################################### 5. zabbix-server 4.0 #####################
 5)
 ### Zabbix-server setup function ###
 config_zabbix_server () {
@@ -424,7 +428,7 @@ else
 fi
 
 ;;
-################################### 8.02 Docker ################################
+################################### 6. Docker ################################
 	6)
 ### Docker function ###
 DockerStart () {
@@ -462,7 +466,7 @@ DockerComposeInstall () {
                         echo ""
                 fi
 	;;
-################################### 9.02 Proxmox VE installation ###############
+################################### 7. Proxmox VE installation ###############
 7)
 AreYouSure
 if [ "$OS" = "stretch" ]; then
@@ -493,7 +497,7 @@ else
 	echo ""
 fi
 ;;
-################################### 10.02 MariaDB 10.3 install #################
+################################### 8. MariaDB 10.3 install #################
 	8)
 		AreYouSure
                 if [ "$OS" = "CentOS7" ]; then
@@ -535,7 +539,7 @@ EOF
                 fi
 
         ;;
-################################### 11.00 GitLab CE installation ###############
+################################### 9. GitLab CE installation ###############
 9)
 AreYouSure
 if [ "$OS" = "CentOS7" ]; then
@@ -580,7 +584,7 @@ else
 	logfile
 fi
 ;;
-###################################### 15.00 jenkins #############################
+###################################### 10. jenkins #############################
 10)
 AreYouSure
 if [ "$OS" = "CentOS7" ]; then
@@ -615,7 +619,138 @@ else
 	echo -e "$C_RED Sorry, OS not supported $C_DEF"
 	logfile
 fi
+;;
+############################## 11. Prometheus ###############################################
+11)
 
+#========== Variables ==========#
+PrometheusVersion='2.15.2'
+AlertmanagerVersion='0.20.0'
+GrafanaVersion='6.6.0'
+host_ip=$(hostname -I | sed s/' '//)
+#========== Prometheus function =============#
+PromInst () {
+# Download Prometheus and install
+	rm -rf /tmp/prometheus*
+	wget -P /tmp/ https://github.com/prometheus/prometheus/releases/download/v${PrometheusVersion}/prometheus-${PrometheusVersion}.linux-amd64.tar.gz
+	mkdir /etc/prometheus /var/lib/prometheus
+	tar zxvf /tmp/prometheus-*.linux-amd64.tar.gz -C /tmp/
+	cp /tmp/prometheus-*.linux-amd64/prometheus /tmp/prometheus-*.linux-amd64/promtool /usr/local/bin/
+	cp -r /tmp/prometheus-*.linux-amd64/console_libraries /tmp/prometheus-*.linux-amd64/consoles /tmp/prometheus-*.linux-amd64/prometheus.yml /etc/prometheus
+	useradd --no-create-home --shell /bin/false prometheus
+	chown -R prometheus:prometheus /etc/prometheus /var/lib/prometheus
+	chown prometheus:prometheus /usr/local/bin/{prometheus,promtool}
+# create systemd service
+cat > /etc/systemd/system/prometheus.service <<EOF
+[Unit]
+Description=Prometheus Service
+After=network.target
+
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+ExecStart=/usr/local/bin/prometheus \
+--config.file /etc/prometheus/prometheus.yml \
+--storage.tsdb.path /var/lib/prometheus/ \
+--web.console.templates=/etc/prometheus/consoles \
+--web.console.libraries=/etc/prometheus/console_libraries
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+systemctl daemon-reload
+systemctl enable prometheus
+chown -R prometheus:prometheus /var/lib/prometheus
+systemctl start prometheus
+
+}
+#========== AlertManager function =============#
+AlManInst () {
+
+# Download and install Alertmanager
+rm -rf /tmp/alertmanager*
+wget -P /tmp/ https://github.com/prometheus/alertmanager/releases/download/v${AlertmanagerVersion}/alertmanager-${AlertmanagerVersion}.linux-amd64.tar.gz
+mkdir /etc/alertmanager /var/lib/prometheus/alertmanager
+tar zxvf /tmp/alertmanager-*.linux-amd64.tar.gz -C /tmp/
+cp /tmp/alertmanager-*.linux-amd64/alertmanager /tmp/alertmanager-*.linux-amd64/amtool /usr/local/bin/
+cp /tmp/alertmanager-*.linux-amd64/alertmanager.yml /etc/alertmanager
+useradd --no-create-home --shell /bin/false alertmanager
+chown -R alertmanager:alertmanager /etc/alertmanager /var/lib/prometheus/alertmanager
+chown alertmanager:alertmanager /usr/local/bin/{alertmanager,amtool}
+# create systemd service
+cat > /etc/systemd/system/alertmanager.service <<EOF
+[Unit]
+Description=Alertmanager Service
+After=network.target
+
+[Service]
+EnvironmentFile=-/etc/default/alertmanager
+User=alertmanager
+Group=alertmanager
+Type=simple
+ExecStart=/usr/local/bin/alertmanager \
+          --config.file=/etc/alertmanager/alertmanager.yml \
+          --storage.path=/var/lib/prometheus/alertmanager \
+          $ALERTMANAGER_OPTS
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+systemctl daemon-reload
+systemctl enable alertmanager
+systemctl start alertmanager
+}
+#========== Grafana function =============#
+GrafanaInst (){
+systemctl start grafana-server
+systemctl status grafana-server
+systemctl enable grafana-server
+}
+#==========================================#
+
+AreYouSure
+if [ "$OS" = "CentOS7" ]; then
+	yum install -y wget
+	PromInst
+	AlManInst
+	wget -P /tmp/ https://dl.grafana.com/oss/release/grafana-${GrafanaVersion}-1.x86_64.rpm
+	yum localinstall -y /tmp/grafana-*.x86_64.rpm
+	GrafanaInst
+	echo ""
+        echo -en "$C_BLUE Continue to setup accessing the web http://${host_ip}:3000 $C_DEF \n"
+        echo ""
+
+elif [[ "$OS" = "stretch" || "$OS" = "buster" ]]; then
+	dpkg-reconfigure locales
+	PromInst
+	AlManInst
+	apt-get update && apt-get install -y adduser libfontconfig1
+	wget -P /tmp/ https://dl.grafana.com/oss/release/grafana_${GrafanaVersion}_amd64.deb
+	dpkg -i /tmp/grafana_*_amd64.deb
+	GrafanaInst
+	echo ""
+        echo -en "$C_BLUE Continue to setup accessing the web http://${host_ip}:3000 $C_DEF \n"
+        echo ""
+
+elif [[ "$OS" = "bionic" ]]; then
+	PromInst
+	AlManInst
+	apt-get update && apt-get install -y adduser libfontconfig1
+	wget -P /tmp/ https://dl.grafana.com/oss/release/grafana_${GrafanaVersion}_amd64.deb
+	dpkg -i /tmp/grafana_*_amd64.deb
+	GrafanaInst
+	echo ""
+        echo -en "$C_BLUE Continue to setup accessing the web http://${host_ip}:3000 $C_DEF \n"
+        echo ""
+
+else
+	echo -e "$C_RED Sorry, OS not supported $C_DEF"
+fi
 
 
 esac
