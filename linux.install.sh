@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 ########################################################
-# Installer by https://github.com/vargaloid Ver.11.0.0 #
+# Installer by https://github.com/vargaloid Ver.11.1.0 #
 ########################################################
 
-Version='11.0.0'
+Version='11.1.0'
 
 C_BLUE='\033[36m'
 C_RED='\033[31m'
@@ -449,7 +449,7 @@ DockerComposeInstall () {
 			yum install -y docker-ce
 			DockerComposeInstall
 			DockerStart
-			logfile
+		
 		elif [[ $OS == "jessie" || $OS == "stretch" ]]; then
 			apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common
 			curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
@@ -459,7 +459,16 @@ DockerComposeInstall () {
 			apt-get install -y docker-ce
 			DockerComposeInstall
 			DockerStart
-			logfile
+
+		elif [[ "$OS" = "bionic" ]]; then
+			apt-get update && apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+			curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+			apt-key fingerprint 0EBFCD88
+			add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+			apt-get update && apt-get install -y docker-ce docker-ce-cli containerd.io
+			DockerComposeInstall
+                        DockerStart
+
                 else
                         echo ""
                         echo "Sorry, your OS is not supported"

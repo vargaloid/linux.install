@@ -13,11 +13,12 @@ Installation Features:
 - Jenkins
 - Prometheus with Grafana
 
-Version 11.0.0
-
-*Numbering changed with this release*
+Current Version 11.1.0
 
 Release notes:
+
+Version 11.1.0
+- added Docker Engine installation for Ubuntu 18.04 Bionic Beaver
 
 Version 11.0.0
 - Prometheus with Grafana installation added
