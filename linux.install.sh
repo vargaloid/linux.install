@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 ########################################################
-# Installer by https://github.com/vargaloid Ver.11.1.0 #
+# Installer by https://github.com/vargaloid Ver.11.2.0 #
 ########################################################
 
-Version='11.1.0'
+Version='11.2.0'
 
 C_BLUE='\033[36m'
 C_RED='\033[31m'
@@ -113,21 +113,20 @@ else
 fi
 
 ################################### 1. Main Menu##############################
-echo "----------------------------------------"
-echo "|    What do you want to install?      |"
-echo "----------------------------------------"
-echo "|1. quit                               |"
-echo "|2. mc,vim,sudo,wget,git               |"
-echo "|3. vsftpd                             |"
-echo "|4. fail2ban-ssh                       |"
-echo "|5. zabbix-server 4.0                  |"
-echo "|6. Docker                             |"
-echo "|7. Proxmox VE5 (stretch), VE6 (buster)|"
-echo "|8. MariaDB 10.3                       |"
-echo "|9. GitLab CE                          |"
-echo "|10. Jenkins                           |"
-echo "|11. Prometheus with Grafana           |"
-echo "----------------------------------------"
+echo "------------------------------------------------------------"
+echo "|    What do you want to install?                          |"
+echo "------------------------------------------------------------"
+echo "|1. quit                                                   |"
+echo "|2. vsftpd                                                 |"
+echo "|3. fail2ban-ssh                                           |"
+echo "|4. zabbix-server 5.0 (buster,centos7)                     |"
+echo "|5. Docker (jessie,stretch,centos7,bionic)                 |"
+echo "|6. Proxmox VE5 (stretch), VE6 (buster)                    |"
+echo "|7. MariaDB 10.4 (jessie,stretch,centos7)                  |"
+echo "|8. GitLab CE (stretch,buster,centos7)                     |"
+echo "|9. Jenkins (stretch,buster,centos7)                       |"
+echo "|10. Prometheus w. Grafana (stretch,buster,centos7,bionic) |"
+echo "------------------------------------------------------------"
 
 read MENU
 
@@ -137,20 +136,8 @@ case $MENU in
 		echo -en "$C_BLUE Bye! $C_DEF \n"
 		echo ""
 	;;
-################################### 2. Utils installation ####################
+################################### 2. vsftpd installation ###################
 	2)
-		AreYouSure
-		if [ "$OS" = "CentOS7" ]; then
-			yum install mc vim sudo wget git -y
-			logfile
-		else
-			apt-get update
-			apt-get install -y mc vim sudo wget git
-			logfile
-		fi
-	;;
-################################### 3. vsftpd installation ###################
-	3)
 ### Vsftpd installation function ###
 config_vsftpd() {
 if [ "$OS" = "CentOS7" ]; then
@@ -253,8 +240,8 @@ CENTOSVSFTPD=/etc/vsftpd
 			logfile
                 fi
         ;;
-################################### 4. fail2ban-ssh ##########################
-  4)
+################################### 3. fail2ban-ssh ##########################
+  3)
 
 		AreYouSure
 if [ "$OS" = "CentOS7" ]; then
@@ -323,11 +310,13 @@ EOF
 	logfile
 fi
 ;;
-################################### 5. zabbix-server 4.0 #####################
-5)
+################################### 4. zabbix-server 5.0 #####################
+4)
 ### Zabbix-server setup function ###
 config_zabbix_server () {
 
+	echo -en "$C_GREEN Please, enter domain name for zabbix server: $C_DEF \n"
+        read z_s_domain_name
 	echo -en "$C_GREEN Please, enter database name for zabbix server: $C_DEF \n"
 	read z_s_db_name
 	echo -en "$C_GREEN Please, enter username for base ${z_s_db_name}: $C_DEF \n"
@@ -342,16 +331,22 @@ config_zabbix_server () {
 
 	echo -en "$C_BLUE \n"
 	echo "Zabbix-server:"
+	echo "Domain name: ${z_s_domain_name}"
 	echo "DB name: ${z_s_db_name}"
 	echo "DB username: ${z_s_username}"
 	echo "DB password: ${z_s_passwd}"
+	echo "Frontend username: Admin"
+	echo "Frontend password: zabbix"
 	echo -en "$C_DEF \n"
 
 	zabbix_conf=/etc/zabbix/zabbix_server.conf
+	timezone=$(timedatectl | grep "Time zone" | awk '{print $3}')
 	if [ "$OS" = "CentOS7" ]; then
-		httpd_conf=/etc/httpd/conf.d/zabbix.conf
+		nginx_conf=/etc/opt/rh/rh-nginx116/nginx/conf.d/zabbix.conf
+		phpfpm_conf=/etc/opt/rh/rh-php72/php-fpm.d/zabbix.conf
 	else
-		httpd_conf=/etc/apache2/conf-available/zabbix.conf
+		nginx_conf=/etc/zabbix/nginx.conf
+		phpfpm_conf=/etc/zabbix/php-fpm.conf
 	fi
 
 	sed -i "/DBName=zabbix/c DBName=${z_s_db_name}" $zabbix_conf
@@ -359,77 +354,63 @@ config_zabbix_server () {
 	sed -i "/AlertScriptsPath=\/usr\/lib\/zabbix\/alertscripts/c AlertScriptsPath=\/etc\/zabbix\/alertscripts" $zabbix_conf
 	sed -i "/ExternalScripts=\/usr\/lib\/zabbix\/externalscripts/c ExternalScripts=\/etc\/zabbix\/externalscripts" $zabbix_conf
 	sed -i "/# DBPassword=/c DBPassword=${z_s_passwd}" $zabbix_conf
+	
+	sed -i "/listen/s/#//" $nginx_conf
+	sed -i "/server_name/s/#//" $nginx_conf
+	sed -i "/example.com/s/example.com/${z_s_domain_name}/" $nginx_conf
 
-	timezone=$(timedatectl | grep "Time zone" | awk '{print $3}')
-	sed -i "/# php_value date.timezone Europe\/Riga/c php_value date.timezone $timezone " $httpd_conf >> $httpd_conf
-
-	systemctl start zabbix-server
-	systemctl enable zabbix-server
+	sed -i "/listen.acl_users = apache/c listen.acl_users = nginx" $phpfpm_conf
+	sed -i "/date.timezone/s/;//" $phpfpm_conf
+	sed -i -e "s|Europe/Riga|${timezone}|" $phpfpm_conf
 
 	if [ "$OS" = "CentOS7" ]; then
 		setenforce Permissive
         	systemctl stop firewalld
 	        systemctl disable firewalld
-		systemctl start httpd
-	        systemctl enable httpd
+		systemctl restart zabbix-server zabbix-agent rh-nginx116-nginx rh-php72-php-fpm
+		systemctl enable zabbix-server zabbix-agent rh-nginx116-nginx rh-php72-php-fpm
 	else
-		systemctl restart apache2
-                systemctl enable apache2
+		systemctl restart zabbix-server zabbix-agent nginx php7.3-fpm
+                systemctl enable zabbix-server zabbix-agent nginx php7.3-fpm
 	fi
 
 	host_ip=$(hostname -I | sed s/' '//)
 	echo ""
 	echo -en "$C_RED Warning!!! firewalld disabled!!! SELINUX in Permissive mode!!! $C_DEF \n"
-	echo -en "$C_BLUE Continue to setup zabbix-server 4.0 accessing the web http://${host_ip}/zabbix $C_DEF \n"
+	echo -en "$C_BLUE Continue to setup zabbix-server 5.0 accessing the web http://$z_s_domain_name} $C_DEF \n"
 	echo ""
 }
 
 ### Zabbix-server process ###
 AreYouSure
 if [ "$OS" = "CentOS7" ]; then
-	rpm -Uvh https://repo.zabbix.com/zabbix/4.0/rhel/7/x86_64/zabbix-release-4.0-2.el7.noarch.rpm
-        yum install -y zabbix-server-mysql zabbix-web-mysql mariadb-server zabbix-agent
+	rpm -Uvh https://repo.zabbix.com/zabbix/5.0/rhel/7/x86_64/zabbix-release-5.0-1.el7.noarch.rpm
+	yum clean all
+        yum install -y zabbix-server-mysql mariadb-server zabbix-agent
+	yum install -y centos-release-scl
+	yum install -y yum-utils
+	yum-config-manager --enable zabbix-frontend
+	yum install -y zabbix-web-mysql-scl zabbix-nginx-conf-scl
 	systemctl start mariadb
 	systemctl enable mariadb
 
 	config_zabbix_server
-	logfile
-
-elif [ "$OS" = "jessie" ]; then
-	wget https://repo.zabbix.com/zabbix/4.0/debian/pool/main/z/zabbix-release/zabbix-release_4.0-3+jessie_all.deb
-	dpkg -i zabbix-release_4.0-3+jessie_all.deb
-	apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-server zabbix-agent
-	systemctl enable mysql
-
-	create_my.cnf
-        config_zabbix_server
-	logfile
-
-elif [ "$OS" = "stretch" ]; then
-        wget https://repo.zabbix.com/zabbix/4.0/debian/pool/main/z/zabbix-release/zabbix-release_4.0-3+stretch_all.deb 
-        dpkg -i zabbix-release_4.0-3+stretch_all.deb 
-        apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-server zabbix-agent
-	systemctl enable mariadb
-
-	config_zabbix_server
-	logfile
 
 elif [ "$OS" = "buster" ]; then
-        wget https://repo.zabbix.com/zabbix/4.0/debian/pool/main/z/zabbix-release/zabbix-release_4.0-3+buster_all.deb 
-        dpkg -i zabbix-release_4.0-3+buster_all.deb 
-        apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php mariadb-server zabbix-agent
+        wget https://repo.zabbix.com/zabbix/5.0/debian/pool/main/z/zabbix-release/zabbix-release_5.0-1+buster_all.deb 
+        dpkg -i zabbix-release_5.0-1+buster_all.deb
+        apt-get update && apt-get install -y zabbix-server-mysql zabbix-frontend-php zabbix-nginx-conf zabbix-agent mariadb-server
         systemctl enable mariadb
 
         config_zabbix_server
-        logfile
 
 else
-        echo "Sorry, OS unknown"
+        echo "Sorry, OS not supported"
 fi
 
 ;;
-################################### 6. Docker ################################
-	6)
+################################### 5. Docker ################################
+	5)
 ### Docker function ###
 DockerStart () {
  systemctl start docker.service
@@ -475,8 +456,8 @@ DockerComposeInstall () {
                         echo ""
                 fi
 	;;
-################################### 7. Proxmox VE installation ###############
-7)
+################################### 6. Proxmox VE installation ###############
+6)
 AreYouSure
 if [ "$OS" = "stretch" ]; then
 	echo "$(hostname -I) $(hostname) pvelocalhost" >> /etc/hosts
@@ -506,50 +487,50 @@ else
 	echo ""
 fi
 ;;
-################################### 8. MariaDB 10.3 install #################
-	8)
+################################### 7. MariaDB 10.4 install #################
+	7)
 		AreYouSure
                 if [ "$OS" = "CentOS7" ]; then
 cat >  /etc/yum.repos.d/MariaDB.repo <<EOF
+# MariaDB 10.4 CentOS repository list - created 2020-05-18 16:14 UTC
 # http://downloads.mariadb.org/mariadb/repositories/
 [mariadb]
 name = MariaDB
-baseurl = http://yum.mariadb.org/10.3/centos7-amd64
+baseurl = http://yum.mariadb.org/10.4/centos7-amd64
 gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
 gpgcheck=1
 EOF
 			yum install -y MariaDB-server MariaDB-client
 			systemctl start mysql
-                        logfile
 
                 elif [ "$OS" = "jessie" ]; then
 cat >  /etc/apt/sources.list.d/MariaDB.list <<EOF
+# MariaDB 10.4 repository list - created 2020-05-18 16:14 UTC
 # http://downloads.mariadb.org/mariadb/repositories/
-deb [arch=amd64,i386] http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian jessie main
-deb-src http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian jessie main
+deb [arch=amd64,i386] http://ftp.hosteurope.de/mirror/mariadb.org/repo/10.4/debian jessie main
+deb-src http://ftp.hosteurope.de/mirror/mariadb.org/repo/10.4/debian jessie main
 EOF
 			apt-get install apt-transport-https ca-certificates -y --force-yes
                         apt-get update
                         apt-get install mariadb-server -y --force-yes
-			logfile
 
                 elif [ "$OS" = "stretch" ]; then
 cat >  /etc/apt/sources.list.d/MariaDB.list <<EOF
+# MariaDB 10.4 repository list - created 2020-05-18 16:15 UTC
 # http://downloads.mariadb.org/mariadb/repositories/
-deb [arch=amd64,i386,ppc64el] http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian stretch main
-deb-src http://mirror.klaus-uwe.me/mariadb/repo/10.3/debian stretch main
+deb [arch=amd64,i386,ppc64el] http://ftp.hosteurope.de/mirror/mariadb.org/repo/10.4/debian stretch main
+deb-src http://ftp.hosteurope.de/mirror/mariadb.org/repo/10.4/debian stretch main
 EOF
 			apt-get install apt-transport-https ca-certificates -y --force-yes
                         apt-get update
                         apt-get install mariadb-server -y --force-yes
-                        logfile
 		else
-                        echo "Sorry, OS unknown"
+                        echo "Sorry, OS not supported"
                 fi
 
         ;;
-################################### 9. GitLab CE installation ###############
-9)
+################################### 8. GitLab CE installation ###############
+8)
 AreYouSure
 if [ "$OS" = "CentOS7" ]; then
 	yum install -y curl policycoreutils-python openssh-server
@@ -593,8 +574,8 @@ else
 	logfile
 fi
 ;;
-###################################### 10. jenkins #############################
-10)
+###################################### 9. jenkins #############################
+9)
 AreYouSure
 if [ "$OS" = "CentOS7" ]; then
 	yum install -y wget java
@@ -629,8 +610,8 @@ else
 	logfile
 fi
 ;;
-############################## 11. Prometheus ###############################################
-11)
+############################## 10. Prometheus ###############################################
+10)
 
 #========== Variables ==========#
 PrometheusVersion='2.15.2'

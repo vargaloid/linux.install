@@ -2,20 +2,24 @@
 Bash script to install some packages
 
 Installation Features:
-- mc,vim,sudo,wget,git
 - vsftpd
 - fail2ban-ssh
-- zabbix-server 4.0 
-- Docker Engine (CE)
+- zabbix-server 5.0 (buster,centos7)
+- Docker Engine (CE) (jessie,stretch,centos7,bionic)
 - Proxmox VE 5 (stretch), VE 6 (buster)
-- MariaDB 10.3
-- GitLab (CE)
-- Jenkins
-- Prometheus with Grafana
+- MariaDB 10.4 (jessie,stretch,centos7)
+- GitLab (CE) (stretch,buster,centos7)
+- Jenkins (stretch,buster,centos7)
+- Prometheus with Grafana (stretch,buster,centos7,bionic)
 
-Current Version 11.1.0
+Current Version 11.2.0
 
 Release notes:
+
+Version 11.2.0
+- version of zabbix-server changed to 5.0 for Debian 10(buster) and CentOS 7
+- utils installation deprecated
+- MariaDB update to 10.4[stable]
 
 Version 11.1.0
 - added Docker Engine installation for Ubuntu 18.04 Bionic Beaver
@@ -27,7 +31,7 @@ Version ~~16.00~~10.0.0
 - Jenkins install added
 
 Version ~~15.00~~9.4.0
-- version of zabbix-server chamged to 4.0
+- version of zabbix-server changed to 4.0
 
 Version ~~14.00~~9.3.0
 - added Proxmox VE 6 to Debian 10 (Buster)
