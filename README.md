@@ -1,6 +1,8 @@
 # varg.install
 Bash script to install some packages
 
+Current version 11.3.0
+
 Installation Features:
 - vsftpd
 - fail2ban-ssh
@@ -12,9 +14,10 @@ Installation Features:
 - Jenkins (stretch,buster,centos7)
 - Prometheus with Grafana (stretch,buster,centos7,bionic)
 
-Current Version 11.2.0
-
 Release notes:
+
+Version 11.3.0
+- Prometheus v.2.18.1, Grafana v.7.0.0
 
 Version 11.2.0
 - version of zabbix-server changed to 5.0 for Debian 10(buster) and CentOS 7

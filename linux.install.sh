@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 ########################################################
-# Installer by https://github.com/vargaloid Ver.11.2.0 #
+# Installer by https://github.com/vargaloid Ver.11.3.0 #
 ########################################################
 
-Version='11.2.0'
+Version='11.3.0'
 
 C_BLUE='\033[36m'
 C_RED='\033[31m'
@@ -614,9 +614,9 @@ fi
 10)
 
 #========== Variables ==========#
-PrometheusVersion='2.15.2'
+PrometheusVersion='2.18.1'
 AlertmanagerVersion='0.20.0'
-GrafanaVersion='6.6.0'
+GrafanaVersion='7.0.0'
 host_ip=$(hostname -I | sed s/' '//)
 #========== Prometheus function =============#
 PromInst () {
